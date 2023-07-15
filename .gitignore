@@ -3,8 +3,7 @@ __localcode
 chromedriver
 mysql_206
 .env
-aula207_ola_django/static_files
-
+db_files
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
