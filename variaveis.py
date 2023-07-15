@@ -1,3 +1,3 @@
 from pathlib import Path
 
-CAMINHO_JSONFILES = Path(__file__).parent / "db_files"
+CAMINHO_DB_FILES = Path(__file__).parent / "db_files"
