@@ -1,7 +1,16 @@
 import os
 import json
+import sys
 from variaveis import CAMINHO_DB_FILES
 from datetime import datetime
+from PySide6.QtGui import QIcon, QFont
+from PySide6.QtWidgets import (QMainWindow,
+                               QVBoxLayout,
+                               QWidget,
+                               QMessageBox,
+                               QApplication,
+                               QPushButton,
+                               )
 # from utils import converte_data_p_str
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
@@ -24,8 +33,6 @@ class Biblioteca:
         self.info_livros = self.importacao(INFO_LIVROS)
         self.emprestimos = self.importacao(EMPRESTIMOS)
         self.id_emprestimo = self.importacao(ID_EMPRESTIMO)
-        for i, j in self.id_emprestimo.items():
-            print(i, j)
 
     def importacao(self, caminho):
         with open(caminho, "r") as arq:
@@ -232,11 +239,51 @@ class Biblioteca:
             break
 
 
+class JanelaPrincipal(QMainWindow):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.setCentralWidget(QWidget())
+        central_widget = self.centralWidget()
+        self.setWindowTitle("Biblioteca")
+
+        self.setWindowIcon(QIcon("./files/whitebiblioteca-80.png"))
+        self.vLayout = QVBoxLayout()
+
+        # adicionando botões
+        self.vLayout.addWidget(Botao("Cadastro Aluno"))
+        self.vLayout.addWidget(Botao("Alteração Aluno"))
+        self.vLayout.addWidget(Botao("Cadastro Livro"))
+        self.vLayout.addWidget(Botao("Alteração livro"))
+        self.vLayout.addWidget(Botao("Empréstimo"))
+        self.vLayout.addWidget(Botao("Devolução"))
+        # pra maximixar a tela
+        # self.showMaximized()
+        central_widget.setLayout(self.vLayout)
+        self.setMinimumSize(1200, 800)
+        self.setStyleSheet("background-color: #00746E;")
+
+
+class Botao(QPushButton):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.configStyles()
+
+    def configStyles(self):
+        fonte = self.font()
+        fonte.setPixelSize(45)
+        fonte.setBold(True)
+
+        self.setMinimumSize(75, 20)
+        self.setStyleSheet("color: #404040;")
+        self.setFont(fonte)
+
+
 if __name__ == "__main__":
-    b1 = Biblioteca()
-    # b1.cadastra_aluno()
-    # b1.cadastra_livro()
-    # b1.altera_aluno()
-    # b1.altera_livro()
-    # b1.fazer_emprestimo()
-    # b1.fazer_devolucao()
+    app = QApplication(sys.argv)
+
+    main_window = JanelaPrincipal()
+    main_window.show()
+
+    sys.exit(app.exec())
