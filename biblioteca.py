@@ -1,17 +1,24 @@
 import os
 import json
 import sys
+import qdarktheme
 from variaveis import CAMINHO_DB_FILES
 from datetime import datetime
-from PySide6.QtGui import QIcon, QFont
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QMainWindow,
+                               QCalendarWidget,
                                QVBoxLayout,
+                               QGridLayout,
+                               QFormLayout,
                                QWidget,
-                               QMessageBox,
+                               QFrame,
                                QApplication,
                                QPushButton,
+                               QLabel,
+                               QDialog,
+                               QLineEdit,
+                               QSpinBox
                                )
-# from utils import converte_data_p_str
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
 INFO_ALUNOS = os.path.join(CAMINHO_DB_FILES, "info_alunos.json")
@@ -20,6 +27,8 @@ INFO_LIVROS = os.path.join(CAMINHO_DB_FILES, "info_livros.json")
 EMPRESTIMOS = os.path.join(CAMINHO_DB_FILES, "emprestimos.json")
 ID_EMPRESTIMO = os.path.join(CAMINHO_DB_FILES, "id_emprestimo.json")
 ANO_ATUAL = datetime.now().year
+MES_ATUAL = datetime.now().month
+DIA_ATUAL = datetime.now().day
 
 
 class Biblioteca:
@@ -239,51 +248,223 @@ class Biblioteca:
             break
 
 
-class JanelaPrincipal(QMainWindow):
+class JanelaPrincipal(QMainWindow, Biblioteca):
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.setCentralWidget(QWidget())
-        central_widget = self.centralWidget()
-        self.setWindowTitle("Biblioteca")
+        # Padrão
+        # Criando o widget central
+        self.widgetCentral = QWidget()
+        self.janelas = Janelas()
+        # Criando os layouts da janela
+        self.meuLayout1 = QGridLayout()
+        self.meuLayout2 = QGridLayout()
 
-        self.setWindowIcon(QIcon("./files/whitebiblioteca-80.png"))
-        self.vLayout = QVBoxLayout()
+        self.criabotoes()
 
-        # adicionando botões
-        self.vLayout.addWidget(Botao("Cadastro Aluno"))
-        self.vLayout.addWidget(Botao("Alteração Aluno"))
-        self.vLayout.addWidget(Botao("Cadastro Livro"))
-        self.vLayout.addWidget(Botao("Alteração livro"))
-        self.vLayout.addWidget(Botao("Empréstimo"))
-        self.vLayout.addWidget(Botao("Devolução"))
-        # pra maximixar a tela
+        self.botoesLayout = GridBotoes([self.CA,
+                                        self.CL,
+                                        self.AA,
+                                        self.AL,
+                                        self.EP,
+                                        self.DV])
+
+        # Setando o meuLayout1 no widget central
+        self.widgetCentral.setLayout(self.meuLayout1)
+
+        # adicionando mais dois layouts no layout central
+        self.meuLayout1.addLayout(self.meuLayout2, 1, 0)
+        self.meuLayout1.addLayout(self.botoesLayout, 2, 0)
+
+        # Colocando o widget central no topo da hierarquia de widgets
+        self.setCentralWidget(self.widgetCentral)
+
+        # criando widget do calendário
+        self.calendario = QCalendarWidget()
+        # criando widget da barra de titulo
+        self.barraTitulo = BarraTitulo()
+
+        # adicionando barra de titulo na primeira linha do layout principal
+        self.meuLayout1.addWidget(self.barraTitulo, 0, 0)
+
+        # adicionando calendario na primeira linha do segundo layout
+        self.meuLayout2.addWidget(
+            self.calendario, 0, 0, 2, 2,
+            Qt.AlignmentFlag.AlignCenter
+            )
+
+        self.config_style()
+        self.config_estilo_calendario()
+
+        slot = self.fazSlotCA(self.janelas.janelaCA)
+        self.CA.clicked.connect(print, "oioioi")
+
+        slot = self.fazSlotCL(self.janelas.janelaCL)
+        self.CL.clicked.connect(slot)
+
+    def config_style(self):
+        # Setando tamanho de 1200x800 enquanto trabalho no projeto
+        self.setFixedSize(1200, 800)
+
+        # Setando para iniciar com a tela maximizada
         # self.showMaximized()
-        central_widget.setLayout(self.vLayout)
-        self.setMinimumSize(1200, 800)
-        self.setStyleSheet("background-color: #00746E;")
+
+        # Setando tamanho mínimo da tela
+        self.setMinimumSize(1100, 900)
+
+        # criando estilo QSS para aplicar no tema do qtdarktheme
+        qss = f"""
+            QPushButton[cssClass="specialButton"] {{
+                color: #fff;
+                background: {'#1e81b0'};
+            }}
+            QPushButton[cssClass="specialButton"]:hover {{
+                color: #fff;
+                background: {'#16658a'};
+            }}
+            QPushButton[cssClass="specialButton"]:pressed {{
+                color: #fff;
+                background: {'#115270'};
+            }}
+        """
+
+        # Setando tema
+        qdarktheme.setup_theme(
+            theme='dark',
+            corner_shape='rounded',
+            custom_colors={
+                "[dark]": {
+                    "primary": f"{'#1e81b0'}",
+                },
+                "[light]": {
+                    "primary": f"{'#1e81b0'}",
+                },
+            },
+            additional_qss=qss
+        )
+
+    def config_estilo_calendario(self):
+        qss = """
+            QCalendarWidget {
+                background-color: #f0f0f0;
+                color: #333;
+            }
+            QCalendarWidget QToolButton {
+                background-color: #1e81b0;
+                color: #fff;
+                border: 1px solid #1e81b0;
+                min-width: 20px;
+                min-height: 20px;
+            }
+            QCalendarWidget QToolButton:hover {
+                background-color: #16658a;
+            }
+            QCalendarWidget QToolButton:pressed {
+                background-color: #115270;
+            }
+
+        """
+        self.calendario.setStyleSheet(qss)
+        self.calendario.setFixedSize(1000, 600)
+
+    def criabotoes(self):
+        self.CA = Botao("1 - Cadastra Aluno")
+        self.CL = Botao("2 - Cadastra Livro")
+        self.AA = Botao("3 - Altera Aluno")
+        self.AL = Botao("4 - Altera Livro")
+        self.EP = Botao("5 - Empréstimo")
+        self.DV = Botao("6 - Devoluçao")
+
+    def fazSlotCA(self, funcao):
+        def _slot():
+            funcao()
+        return _slot
+
+    def fazSlotCL(self, funcao):
+        def _slot():
+            funcao()
+        return _slot
+
+
+class BarraTitulo(QFrame):
+    def __init__(self):
+        super().__init__()
+        self.setAutoFillBackground(True)
+        self.setFixedHeight(45)
+        self.setStyleSheet("background-color: #1e81b0; color: white;")
+
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(5, 0, 5, 0)
+
+        self.titulo_label = QLabel("Biblioteca")
+        self.titulo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        layout.addWidget(self.titulo_label)
 
 
 class Botao(QPushButton):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.configStyles()
 
-    def configStyles(self):
         fonte = self.font()
-        fonte.setPixelSize(45)
+        fonte.setPixelSize(40)
         fonte.setBold(True)
-
-        self.setMinimumSize(75, 20)
-        self.setStyleSheet("color: #404040;")
+        self.setMinimumSize(50, 50)
         self.setFont(fonte)
+
+
+class GridBotoes(QGridLayout):
+    def __init__(self, botoes: list[Botao], *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.addWidget(botoes[0], 1, 0)
+        self.addWidget(botoes[1], 1, 1)
+        self.addWidget(botoes[2], 2, 0)
+        self.addWidget(botoes[3], 2, 1)
+        self.addWidget(botoes[4], 3, 0)
+        self.addWidget(botoes[5], 3, 1)
+
+
+class Janelas(QDialog):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+    def janelaCA(self):
+        self.setWindowTitle("Cadastro de Aluno")
+        self.setMinimumSize(600, 800)
+        layoutca = QFormLayout()
+        self.setLayout(layoutca)
+        layoutca.addRow("Nome Aluno:", QLineEdit())
+        layoutca.addRow("Idade:", QSpinBox())
+        layoutca.addRow("Série:", QLineEdit())
+        layoutca.addRow("Turno:", QLineEdit())
+        layoutca.addRow("Contato:", QLineEdit())
+        layoutca.addRow("Endereço:", QLineEdit())
+        botao_cadastrar = QPushButton("Cadastrar")
+        botao_cadastrar.setFixedSize(175, 35)
+        layoutca.addWidget(botao_cadastrar)
+        self.show()
+
+    def janelaCL(self):
+        self.setWindowTitle("Cadastro de Livro")
+        self.setMinimumSize(300, 400)
+        layoutcl = QFormLayout()
+        self.setLayout(layoutcl)
+        layoutcl.addRow("Titulo Livro:", QLineEdit())
+        layoutcl.addRow("Genero:", QLineEdit())
+        layoutcl.addRow("Autor:", QLineEdit())
+        layoutcl.addRow("Editora:", QLineEdit())
+        layoutcl.addRow("Quantidade:", QSpinBox())
+        botao_cadastrar = QPushButton("Cadastrar")
+        botao_cadastrar.setFixedSize(175, 35)
+        layoutcl.addWidget(botao_cadastrar)
+        self.show()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    main_window = JanelaPrincipal()
-    main_window.show()
+    janelaCentral = JanelaPrincipal()
 
+    janelaCentral.show()
     sys.exit(app.exec())
