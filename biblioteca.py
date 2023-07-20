@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+# from typing import Optional
 import qdarktheme
 from variaveis import CAMINHO_DB_FILES
 from datetime import datetime
@@ -256,7 +257,8 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         # Padrão
         # Criando o widget central
         self.widgetCentral = QWidget()
-        self.janelas = Janelas()
+        self.janelaCA = JanelaCA()
+        self.janelaCL = JanelaCL()
         # Criando os layouts da janela
         self.meuLayout1 = QGridLayout()
         self.meuLayout2 = QGridLayout()
@@ -297,11 +299,13 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         self.config_style()
         self.config_estilo_calendario()
 
-        slot = self.fazSlotCA(self.janelas.janelaCA)
-        self.CA.clicked.connect(print, "oioioi")
+        # Área de criação de slots usando closure para adiar a execução da
+        # função, aqui a função self.janelaCA.show aguarda self.CA ser clicado
+        # para executar. Assim as janelas só aparecem quando o botão da
+        # respectiva janela for clicado
+        self.CA.clicked.connect(self.fazSlot(self.janelaCA.show))
 
-        slot = self.fazSlotCL(self.janelas.janelaCL)
-        self.CL.clicked.connect(slot)
+        self.CL.clicked.connect(self.fazSlot(self.janelaCL.show))
 
     def config_style(self):
         # Setando tamanho de 1200x800 enquanto trabalho no projeto
@@ -376,12 +380,7 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         self.EP = Botao("5 - Empréstimo")
         self.DV = Botao("6 - Devoluçao")
 
-    def fazSlotCA(self, funcao):
-        def _slot():
-            funcao()
-        return _slot
-
-    def fazSlotCL(self, funcao):
+    def fazSlot(self, funcao):
         def _slot():
             funcao()
         return _slot
@@ -425,11 +424,11 @@ class GridBotoes(QGridLayout):
         self.addWidget(botoes[5], 3, 1)
 
 
-class Janelas(QDialog):
+# classes para as janelas secundárias apenas com estilos
+class JanelaCA(QDialog):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def janelaCA(self):
         self.setWindowTitle("Cadastro de Aluno")
         self.setMinimumSize(600, 800)
         layoutca = QFormLayout()
@@ -443,11 +442,14 @@ class Janelas(QDialog):
         botao_cadastrar = QPushButton("Cadastrar")
         botao_cadastrar.setFixedSize(175, 35)
         layoutca.addWidget(botao_cadastrar)
-        self.show()
 
-    def janelaCL(self):
+
+class JanelaCL(QDialog):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
         self.setWindowTitle("Cadastro de Livro")
-        self.setMinimumSize(300, 400)
+        self.setMinimumSize(600, 800)
         layoutcl = QFormLayout()
         self.setLayout(layoutcl)
         layoutcl.addRow("Titulo Livro:", QLineEdit())
@@ -458,7 +460,6 @@ class Janelas(QDialog):
         botao_cadastrar = QPushButton("Cadastrar")
         botao_cadastrar.setFixedSize(175, 35)
         layoutcl.addWidget(botao_cadastrar)
-        self.show()
 
 
 if __name__ == "__main__":
