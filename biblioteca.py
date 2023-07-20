@@ -18,7 +18,8 @@ from PySide6.QtWidgets import (QMainWindow,
                                QLabel,
                                QDialog,
                                QLineEdit,
-                               QSpinBox
+                               QSpinBox,
+                               QDateEdit,
                                )
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
@@ -190,14 +191,14 @@ class Biblioteca:
                 break
 
     def fazer_emprestimo(self):
-        r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
-        if r in "nN":
-            nome = input("Digite o nome do aluno: ")
-            for chave, valor in self.info_alunos.items():
-                if nome.lower() in valor \
-                    or nome.capitalize() in valor \
-                        or nome.title() in valor:
-                    print(" ID:", chave, "\n", valor)
+        # r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
+        # if r in "nN":
+        #     nome = input("Digite o nome do aluno: ")
+        #     for chave, valor in self.info_alunos.items():
+        #         if nome.lower() in valor \
+        #             or nome.capitalize() in valor \
+        #                 or nome.title() in valor:
+        #             print(" ID:", chave, "\n", valor)
         while True:
             _id = input("Digite o ID do aluno: ")
 
@@ -220,14 +221,14 @@ class Biblioteca:
             break
 
     def fazer_devolucao(self):
-        r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
-        if r in "nN":
-            nome = input("Digite o nome do aluno: ")
-            for chave, valor in self.info_alunos.items():
-                if nome.lower() in valor \
-                    or nome.capitalize() in valor \
-                        or nome.title() in valor:
-                    print(" ID:", chave, "\n", valor)
+        # r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
+        # if r in "nN":
+        #     nome = input("Digite o nome do aluno: ")
+        #     for chave, valor in self.info_alunos.items():
+        #         if nome.lower() in valor \
+        #             or nome.capitalize() in valor \
+        #                 or nome.title() in valor:
+        #             print(" ID:", chave, "\n", valor)
 
         while True:
             _id = input("Digite o ID do aluno: ")
@@ -257,9 +258,16 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         # Padrão
         # Criando o widget central
         self.widgetCentral = QWidget()
+
+        # Criando janelas para cada botão
         self.janelaCA = JanelaCA()
         self.janelaCL = JanelaCL()
-        # Criando os layouts da janela
+        self.janelaAA = JanelaAA()
+        self.janelaAL = JanelaAL()
+        self.janelaEP = JanelaEP()
+        self.janelaDV = JanelaDV()
+
+        # Criando os layouts da janela principal
         self.meuLayout1 = QGridLayout()
         self.meuLayout2 = QGridLayout()
 
@@ -306,6 +314,14 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         self.CA.clicked.connect(self.fazSlot(self.janelaCA.show))
 
         self.CL.clicked.connect(self.fazSlot(self.janelaCL.show))
+
+        self.AA.clicked.connect(self.fazSlot(self.janelaAA.show))
+
+        self.AL.clicked.connect(self.fazSlot(self.janelaAL.show))
+
+        self.EP.clicked.connect(self.fazSlot(self.janelaEP.show))
+
+        self.DV.clicked.connect(self.fazSlot(self.janelaDV.show))
 
     def config_style(self):
         # Setando tamanho de 1200x800 enquanto trabalho no projeto
@@ -367,9 +383,10 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
             QCalendarWidget QToolButton:pressed {
                 background-color: #115270;
             }
-
         """
+
         self.calendario.setStyleSheet(qss)
+
         self.calendario.setFixedSize(1000, 600)
 
     def criabotoes(self):
@@ -460,6 +477,63 @@ class JanelaCL(QDialog):
         botao_cadastrar = QPushButton("Cadastrar")
         botao_cadastrar.setFixedSize(175, 35)
         layoutcl.addWidget(botao_cadastrar)
+
+
+class JanelaAA(JanelaCA):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.setWindowTitle("Alteração de Cadastro - Aluno")
+
+
+class JanelaAL(JanelaCL):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.setWindowTitle("Alteração de Cadastro - livro")
+
+
+class JanelaEP(QDialog):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.setWindowTitle("Empréstimo")
+        self.setMinimumSize(600, 800)
+        layoutep = QFormLayout()
+        self.setLayout(layoutep)
+        botao_id = QSpinBox()
+        botao_id.setRange(0, 9999999)
+        layoutep.addRow("ID do ALuno:", botao_id)
+        layoutep.addRow("Nome Aluno:", QLineEdit())
+
+        layoutep.addRow("Livro:", QLineEdit())
+        botao_data = QDateEdit()
+        botao_data.setCalendarPopup(True)
+        layoutep.addRow("Devolução:", botao_data)
+
+        botao_emprestar = QPushButton("Emprestar")
+        botao_emprestar.setFixedSize(175, 35)
+        layoutep.addWidget(botao_emprestar)
+
+
+class JanelaDV(QDialog):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        self.setWindowTitle("Devolução")
+        self.setMinimumSize(600, 800)
+        layoutdv = QFormLayout()
+        self.setLayout(layoutdv)
+        botao_id = QSpinBox()
+        botao_id.setRange(0, 9999999)
+        layoutdv.addRow("ID do ALuno:", botao_id)
+        layoutdv.addRow("Nome Aluno:", QLineEdit())
+
+        botao_chave = QSpinBox()
+        botao_chave.setRange(0, 9999999)
+        layoutdv.addRow("Chave:", botao_chave)
+
+        botao_devolver = QPushButton("Devolver")
+        botao_devolver.setFixedSize(175, 35)
+        layoutdv.addWidget(botao_devolver)
 
 
 if __name__ == "__main__":
