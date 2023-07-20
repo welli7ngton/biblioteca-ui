@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (QMainWindow,
                                QLineEdit,
                                QSpinBox,
                                QDateEdit,
+                               QDialogButtonBox
                                )
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
@@ -250,11 +251,12 @@ class Biblioteca:
             break
 
 
-class JanelaPrincipal(QMainWindow, Biblioteca):
+class JanelaPrincipal(QMainWindow):
 
     def __init__(self) -> None:
         super().__init__()
 
+        self.b1 = Biblioteca()
         # Padrão
         # Criando o widget central
         self.widgetCentral = QWidget()
@@ -307,21 +309,17 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
         self.config_style()
         self.config_estilo_calendario()
 
-        # Área de criação de slots usando closure para adiar a execução da
-        # função, aqui a função self.janelaCA.show aguarda self.CA ser clicado
-        # para executar. Assim as janelas só aparecem quando o botão da
-        # respectiva janela for clicado
-        self.CA.clicked.connect(self.fazSlot(self.janelaCA.show))
+        self.CA.clicked.connect(self.janelaCA.show)
 
-        self.CL.clicked.connect(self.fazSlot(self.janelaCL.show))
+        self.CL.clicked.connect(self.janelaCL.show)
 
-        self.AA.clicked.connect(self.fazSlot(self.janelaAA.show))
+        self.AA.clicked.connect(self.janelaAA.show)
 
-        self.AL.clicked.connect(self.fazSlot(self.janelaAL.show))
+        self.AL.clicked.connect(self.janelaAL.show)
 
-        self.EP.clicked.connect(self.fazSlot(self.janelaEP.show))
+        self.EP.clicked.connect(self.janelaEP.show)
 
-        self.DV.clicked.connect(self.fazSlot(self.janelaDV.show))
+        self.DV.clicked.connect(self.janelaDV.show)
 
     def config_style(self):
         # Setando tamanho de 1200x800 enquanto trabalho no projeto
@@ -332,22 +330,6 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
 
         # Setando tamanho mínimo da tela
         self.setMinimumSize(1100, 900)
-
-        # criando estilo QSS para aplicar no tema do qtdarktheme
-        qss = f"""
-            QPushButton[cssClass="specialButton"] {{
-                color: #fff;
-                background: {'#1e81b0'};
-            }}
-            QPushButton[cssClass="specialButton"]:hover {{
-                color: #fff;
-                background: {'#16658a'};
-            }}
-            QPushButton[cssClass="specialButton"]:pressed {{
-                color: #fff;
-                background: {'#115270'};
-            }}
-        """
 
         # Setando tema
         qdarktheme.setup_theme(
@@ -360,8 +342,7 @@ class JanelaPrincipal(QMainWindow, Biblioteca):
                 "[light]": {
                     "primary": f"{'#1e81b0'}",
                 },
-            },
-            additional_qss=qss
+            }
         )
 
     def config_estilo_calendario(self):
@@ -456,9 +437,12 @@ class JanelaCA(QDialog):
         layoutca.addRow("Turno:", QLineEdit())
         layoutca.addRow("Contato:", QLineEdit())
         layoutca.addRow("Endereço:", QLineEdit())
-        botao_cadastrar = QPushButton("Cadastrar")
-        botao_cadastrar.setFixedSize(175, 35)
-        layoutca.addWidget(botao_cadastrar)
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        b_box.setAccessibleName("teste")
+        layoutca.addWidget(b_box)
+
+        b_box.accepted.connect(self.accept)
+        b_box.rejected.connect(self.reject)
 
 
 class JanelaCL(QDialog):
@@ -474,9 +458,13 @@ class JanelaCL(QDialog):
         layoutcl.addRow("Autor:", QLineEdit())
         layoutcl.addRow("Editora:", QLineEdit())
         layoutcl.addRow("Quantidade:", QSpinBox())
-        botao_cadastrar = QPushButton("Cadastrar")
-        botao_cadastrar.setFixedSize(175, 35)
-        layoutcl.addWidget(botao_cadastrar)
+
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        b_box.setAccessibleName("teste")
+        layoutcl.addWidget(b_box)
+
+        b_box.accepted.connect(self.accept)
+        b_box.rejected.connect(self.reject)
 
 
 class JanelaAA(JanelaCA):
@@ -509,9 +497,12 @@ class JanelaEP(QDialog):
         botao_data.setCalendarPopup(True)
         layoutep.addRow("Devolução:", botao_data)
 
-        botao_emprestar = QPushButton("Emprestar")
-        botao_emprestar.setFixedSize(175, 35)
-        layoutep.addWidget(botao_emprestar)
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        b_box.setAccessibleName("teste")
+        layoutep.addWidget(b_box)
+
+        b_box.accepted.connect(self.accept)
+        b_box.rejected.connect(self.reject)
 
 
 class JanelaDV(QDialog):
@@ -531,9 +522,12 @@ class JanelaDV(QDialog):
         botao_chave.setRange(0, 9999999)
         layoutdv.addRow("Chave:", botao_chave)
 
-        botao_devolver = QPushButton("Devolver")
-        botao_devolver.setFixedSize(175, 35)
-        layoutdv.addWidget(botao_devolver)
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        b_box.setAccessibleName("teste")
+        layoutdv.addWidget(b_box)
+
+        b_box.accepted.connect(self.accept)
+        b_box.rejected.connect(self.reject)
 
 
 if __name__ == "__main__":
