@@ -20,7 +20,8 @@ from PySide6.QtWidgets import (QMainWindow,
                                QLineEdit,
                                QSpinBox,
                                QDateEdit,
-                               QDialogButtonBox
+                               QDialogButtonBox,
+                               QMessageBox
                                )
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
@@ -55,31 +56,39 @@ class Biblioteca:
         with open(caminho, "w") as arq:
             json.dump(dados, arq, ensure_ascii=False, indent=2)
 
-    def cadastra_aluno(self):
+    def cadastra_aluno(
+            self,
+            nome: str,
+            idade: str,
+            serie: str,
+            turno: str,
+            contato: str,
+            endereco: str
+            ):
         _id = str(len(self.id_alunos))
         if _id in self.id_alunos:
             return False
         self.id_alunos.append(_id)
-        print("ID =", _id)
+        # print("ID =", _id)
 
         # ########### change ########### #
-        nome = input("Nome do Aluno: ")
-        idade = int(input("Idade: "))
-        serie = input("Série: ")
-        turno = input("Turno: ")
-        contato = input("Contato (00 0 0000-0000): ")
-        print("Endereço: Rua, Bairro, Número.:")
-        endereco = input()
+        # nome = input("Nome do Aluno: ")
+        # idade = int(input("Idade: "))
+        # serie = input("Série: ")
+        # turno = input("Turno: ")
+        # contato = input("Contato (00 0 0000-0000): ")
+        # print("Endereço: Rua, Bairro, Número.:")
+        # endereco = input()
         # ########### change ########### #
 
         self.info_alunos[_id] = (
-            f"Nome: {nome.capitalize()}, Série: {serie}, "
-            f"Turno: {turno}, Idade: {idade}, Contato: {contato}, "
-            f"Endereço: {endereco.capitalize()}"
+            f"ID: {_id}, Nome: {nome.title()}, Série: {serie}, "
+            f"Turno: {turno.title()}, Idade: {idade}, Contato: {contato}, "
+            f"Endereço: {endereco.title()}"
         )
-
         self.exportacao(IDS_ALUNOS, self.id_alunos)
         self.exportacao(INFO_ALUNOS, self.info_alunos)
+        return self.info_alunos[_id]
 
     def cadastra_livro(self):
 
@@ -262,58 +271,58 @@ class JanelaPrincipal(QMainWindow):
         self.widgetCentral = QWidget()
 
         # Criando janelas para cada botão
-        self.janelaCA = JanelaCA()
+        self.janelaCA = JanelaCA(self.b1)
         self.janelaCL = JanelaCL()
-        self.janelaAA = JanelaAA()
+        # self.janelaAA = JanelaAA(self.b1)
         self.janelaAL = JanelaAL()
         self.janelaEP = JanelaEP()
         self.janelaDV = JanelaDV()
 
         # Criando os layouts da janela principal
-        self.meuLayout1 = QGridLayout()
-        self.meuLayout2 = QGridLayout()
-
+        self.meuLayout1 = QVBoxLayout()
+        self.layout_botoes = QGridLayout()
         self.criabotoes()
-
-        self.botoesLayout = GridBotoes([self.CA,
-                                        self.CL,
-                                        self.AA,
-                                        self.AL,
-                                        self.EP,
-                                        self.DV])
-
-        # Setando o meuLayout1 no widget central
-        self.widgetCentral.setLayout(self.meuLayout1)
-
-        # adicionando mais dois layouts no layout central
-        self.meuLayout1.addLayout(self.meuLayout2, 1, 0)
-        self.meuLayout1.addLayout(self.botoesLayout, 2, 0)
-
-        # Colocando o widget central no topo da hierarquia de widgets
-        self.setCentralWidget(self.widgetCentral)
 
         # criando widget do calendário
         self.calendario = QCalendarWidget()
+        self.config_estilo_calendario()
+
         # criando widget da barra de titulo
         self.barraTitulo = BarraTitulo()
 
         # adicionando barra de titulo na primeira linha do layout principal
-        self.meuLayout1.addWidget(self.barraTitulo, 0, 0)
-
-        # adicionando calendario na primeira linha do segundo layout
-        self.meuLayout2.addWidget(
-            self.calendario, 0, 0, 2, 2,
-            Qt.AlignmentFlag.AlignCenter
+        self.meuLayout1.addWidget(
+            self.barraTitulo,
             )
 
+        # adicionando calendario na primeira linha do segundo layout
+        self.meuLayout1.addWidget(
+            self.calendario,
+            alignment=Qt.AlignmentFlag.AlignCenter
+            )
+
+        # Colocando o widget central no topo da hierarquia de widgets
+        self.setCentralWidget(self.widgetCentral)
+
+        self.meuLayout1.addLayout(self.layout_botoes)
+
+        # Setando o meuLayout1 no widget central
+        self.widgetCentral.setLayout(self.meuLayout1)
+
+        self.layout_botoes.addWidget(self.CA, 0, 0)
+        self.layout_botoes.addWidget(self.CL, 0, 1)
+        self.layout_botoes.addWidget(self.AA, 1, 0)
+        self.layout_botoes.addWidget(self.AL, 1, 1)
+        self.layout_botoes.addWidget(self.EP, 2, 0)
+        self.layout_botoes.addWidget(self.DV, 2, 1)
+
         self.config_style()
-        self.config_estilo_calendario()
 
         self.CA.clicked.connect(self.janelaCA.show)
 
         self.CL.clicked.connect(self.janelaCL.show)
 
-        self.AA.clicked.connect(self.janelaAA.show)
+        # self.AA.clicked.connect(self.janelaAA.show)
 
         self.AL.clicked.connect(self.janelaAL.show)
 
@@ -323,13 +332,13 @@ class JanelaPrincipal(QMainWindow):
 
     def config_style(self):
         # Setando tamanho de 1200x800 enquanto trabalho no projeto
-        self.setFixedSize(1200, 800)
+        self.setFixedSize(1200, 975)
 
         # Setando para iniciar com a tela maximizada
         # self.showMaximized()
 
         # Setando tamanho mínimo da tela
-        self.setMinimumSize(1100, 900)
+        # self.setMinimumSize(1200, 975)
 
         # Setando tema
         qdarktheme.setup_theme(
@@ -367,8 +376,7 @@ class JanelaPrincipal(QMainWindow):
         """
 
         self.calendario.setStyleSheet(qss)
-
-        self.calendario.setFixedSize(1000, 600)
+        self.calendario.setFixedSize(800, 700)
 
     def criabotoes(self):
         self.CA = Botao("1 - Cadastra Aluno")
@@ -387,12 +395,11 @@ class JanelaPrincipal(QMainWindow):
 class BarraTitulo(QFrame):
     def __init__(self):
         super().__init__()
-        self.setAutoFillBackground(True)
+        # self.setAutoFillBackground(True)
         self.setFixedHeight(45)
         self.setStyleSheet("background-color: #1e81b0; color: white;")
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 0, 5, 0)
 
         self.titulo_label = QLabel("Biblioteca")
         self.titulo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -407,42 +414,62 @@ class Botao(QPushButton):
         fonte = self.font()
         fonte.setPixelSize(40)
         fonte.setBold(True)
-        self.setMinimumSize(50, 50)
         self.setFont(fonte)
-
-
-class GridBotoes(QGridLayout):
-    def __init__(self, botoes: list[Botao], *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.addWidget(botoes[0], 1, 0)
-        self.addWidget(botoes[1], 1, 1)
-        self.addWidget(botoes[2], 2, 0)
-        self.addWidget(botoes[3], 2, 1)
-        self.addWidget(botoes[4], 3, 0)
-        self.addWidget(botoes[5], 3, 1)
 
 
 # classes para as janelas secundárias apenas com estilos
 class JanelaCA(QDialog):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
+        biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Aluno")
         self.setMinimumSize(600, 800)
         layoutca = QFormLayout()
         self.setLayout(layoutca)
-        layoutca.addRow("Nome Aluno:", QLineEdit())
-        layoutca.addRow("Idade:", QSpinBox())
-        layoutca.addRow("Série:", QLineEdit())
-        layoutca.addRow("Turno:", QLineEdit())
-        layoutca.addRow("Contato:", QLineEdit())
-        layoutca.addRow("Endereço:", QLineEdit())
-        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        b_box.setAccessibleName("teste")
-        layoutca.addWidget(b_box)
 
-        b_box.accepted.connect(self.accept)
-        b_box.rejected.connect(self.reject)
+        botoes = [nome := QLineEdit(), idade := QSpinBox(),
+                  serie := QLineEdit(), turno := QLineEdit(),
+                  contato := QLineEdit(), endereco := QLineEdit()]
+        titulos = ["Nome Aluno", "Idade",
+                   "Série", "Turno",
+                   "Contato", "Endereço"]
+        for titulo, botao in enumerate(botoes):
+            layoutca.addRow(str(titulos[titulo]), botao)
+
+        botoes_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            )
+
+        layoutca.addWidget(botoes_box)
+        botoes_box.accepted.connect(self.faz_slot(
+            biblioteca.cadastra_aluno,
+            nome,
+            idade,
+            serie,
+            turno,
+            contato,
+            endereco
+        ))
+
+        botoes_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, *args: Botao):
+        def slot():
+            n, i, s, t, c, e = args
+            msg = func(n.text(),
+                       i.text(),
+                       s.text(),
+                       t.text(),
+                       c.text(),
+                       e.text())
+            for b in args:
+                b.clear()
+            mensagem = QMessageBox()
+            mensagem.setWindowTitle("Cadastro realizado!")
+            mensagem.setIcon(mensagem.Icon.Information)
+            mensagem.setText(msg)
+            mensagem.exec()
+        return slot
 
 
 class JanelaCL(QDialog):
@@ -467,10 +494,10 @@ class JanelaCL(QDialog):
         b_box.rejected.connect(self.reject)
 
 
-class JanelaAA(JanelaCA):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.setWindowTitle("Alteração de Cadastro - Aluno")
+# class JanelaAA(JanelaCA):
+#     def __init__(self, *args, **kwargs) -> None:
+#         super().__init__(*args, **kwargs)
+#         self.setWindowTitle("Alteração de Cadastro - Aluno")
 
 
 class JanelaAL(JanelaCL):
