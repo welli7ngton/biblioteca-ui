@@ -423,18 +423,17 @@ class JanelaCA(QDialog):
         super().__init__(*args, **kwargs)
         biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Aluno")
-        self.setMinimumSize(600, 800)
+        self.setMinimumSize(600, 350)
         layoutca = QFormLayout()
         self.setLayout(layoutca)
-
-        botoes = [nome := QLineEdit(), idade := QSpinBox(),
-                  serie := QLineEdit(), turno := QLineEdit(),
-                  contato := QLineEdit(), endereco := QLineEdit()]
+        campo_texto = [nome := QLineEdit(), idade := QSpinBox(),
+                       serie := QLineEdit(), turno := QLineEdit(),
+                       contato := QLineEdit(), endereco := QLineEdit()]
         titulos = ["Nome Aluno", "Idade",
                    "Série", "Turno",
                    "Contato", "Endereço"]
-        for titulo, botao in enumerate(botoes):
-            layoutca.addRow(str(titulos[titulo]), botao)
+        for titulo, campo in enumerate(campo_texto):
+            layoutca.addRow(str(titulos[titulo]), campo)
 
         botoes_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
