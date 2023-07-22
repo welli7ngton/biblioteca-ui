@@ -1,0 +1,9 @@
+darkdetect==0.7.1
+DateTime==5.1
+pyqtdarktheme==2.1.0
+PySide6==6.5.1.1
+PySide6-Addons==6.5.1.1
+PySide6-Essentials==6.5.1.1
+pytz==2023.3
+shiboken6==6.5.1.1
+zope.interface==6.0
