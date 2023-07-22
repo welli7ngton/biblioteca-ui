@@ -6,23 +6,11 @@ import qdarktheme
 from variaveis import CAMINHO_DB_FILES
 from datetime import datetime
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QMainWindow,
-                               QCalendarWidget,
-                               QVBoxLayout,
-                               QGridLayout,
-                               QFormLayout,
-                               QWidget,
-                               QFrame,
-                               QApplication,
-                               QPushButton,
-                               QLabel,
-                               QDialog,
-                               QLineEdit,
-                               QSpinBox,
-                               QDateEdit,
-                               QDialogButtonBox,
-                               QMessageBox
-                               )
+from PySide6.QtWidgets import (QMainWindow, QCalendarWidget, QVBoxLayout,
+                               QGridLayout, QFormLayout, QWidget, QFrame,
+                               QApplication, QPushButton, QLabel, QDialog,
+                               QLineEdit, QSpinBox, QDateEdit,
+                               QDialogButtonBox, QMessageBox)
 
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
 INFO_ALUNOS = os.path.join(CAMINHO_DB_FILES, "info_alunos.json")
@@ -69,17 +57,6 @@ class Biblioteca:
         if _id in self.id_alunos:
             return False
         self.id_alunos.append(_id)
-        # print("ID =", _id)
-
-        # ########### change ########### #
-        # nome = input("Nome do Aluno: ")
-        # idade = int(input("Idade: "))
-        # serie = input("Série: ")
-        # turno = input("Turno: ")
-        # contato = input("Contato (00 0 0000-0000): ")
-        # print("Endereço: Rua, Bairro, Número.:")
-        # endereco = input()
-        # ########### change ########### #
 
         self.info_alunos[_id] = (
             f"ID: {_id}, Nome: {nome.title()}, Série: {serie}, "
