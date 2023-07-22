@@ -45,14 +45,9 @@ class Biblioteca:
             json.dump(dados, arq, ensure_ascii=False, indent=2)
 
     def cadastra_aluno(
-            self,
-            nome: str,
-            idade: str,
-            serie: str,
-            turno: str,
-            contato: str,
-            endereco: str
-            ):
+            self, nome: str, idade: str, serie: str,
+            turno: str, contato: str, endereco: str):
+
         _id = str(len(self.id_alunos))
         if _id in self.id_alunos:
             return False
@@ -112,34 +107,16 @@ class Biblioteca:
         self.exportacao(IDS_LIVROS, self.id_livros)
         self.exportacao(INFO_LIVROS, self.info_livros)
 
-    def altera_aluno(self):
-        while True:
-            verificador = input("Digite o ID do Aluno que quer alterar: ")
-            if verificador not in self.id_alunos:
-                print(
-                    "Aluno não cadastrado ou numeração inválida, "
-                    "revise e digite uma numeração válida."
-                    )
-                continue
-            else:
-                print("O cadastro que vai ser alterado é:")
-                print(self.info_alunos[verificador])
-                print("Digite as alterações:")
-                nome = input("Nome do Aluno: ")
-                serie = str(input("Série: "))
-                turno = input("Turno: ")
-                idade = int(input("Idade: "))
-                print("Contato: 00 0 0000 0000")
-                contato = input()
-                print("Endereço: Rua, Bairro, Número.:")
-                endereco = input()
-                # atualizando dicionário
-                self.info_alunos[verificador] = (
-                    f"Nome: {nome.capitalize()}, Série: {serie}, "
-                    f"Turno: {turno}, Idade: {idade}, Contato: {contato}, "
-                    f"Endereço: {endereco.capitalize()}")
-                self.exportacao(INFO_ALUNOS, self.info_alunos)
-                break
+    def altera_aluno(
+            self, _id: str, nome: str, idade: str, serie: str,
+            turno: str, contato: str, endereco: str):
+
+        self.info_alunos[_id] = (
+            f"Nome: {nome.title()}, Série: {serie}, "
+            f"Turno: {turno.title()}, Idade: {idade}, Contato: {contato}, "
+            f"Endereço: {endereco.title()}")
+        self.exportacao(INFO_ALUNOS, self.info_alunos)
+        return self.info_alunos[_id]
 
     def altera_livro(self):
         while True:
@@ -248,9 +225,9 @@ class JanelaPrincipal(QMainWindow):
         self.widgetCentral = QWidget()
 
         # Criando janelas para cada botão
-        self.janelaCA = JanelaCA(self.b1)
+        self.janelaCA = JanelaCadastraAluno(self.b1)
         self.janelaCL = JanelaCL()
-        # self.janelaAA = JanelaAA(self.b1)
+        self.janelaAA = JanelaAteraAluno(self.b1)
         self.janelaAL = JanelaAL()
         self.janelaEP = JanelaEP()
         self.janelaDV = JanelaDV()
@@ -299,7 +276,7 @@ class JanelaPrincipal(QMainWindow):
 
         self.CL.clicked.connect(self.janelaCL.show)
 
-        # self.AA.clicked.connect(self.janelaAA.show)
+        self.AA.clicked.connect(self.janelaAA.show)
 
         self.AL.clicked.connect(self.janelaAL.show)
 
@@ -395,49 +372,40 @@ class Botao(QPushButton):
 
 
 # classes para as janelas secundárias apenas com estilos
-class JanelaCA(QDialog):
+class JanelaCadastraAluno(QDialog):
     def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        biblioteca = _biblioteca
+        self.biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Aluno")
         self.setMinimumSize(600, 350)
-        layoutca = QFormLayout()
-        self.setLayout(layoutca)
-        campo_texto = [nome := QLineEdit(), idade := QSpinBox(),
-                       serie := QLineEdit(), turno := QLineEdit(),
-                       contato := QLineEdit(), endereco := QLineEdit()]
-        titulos = ["Nome Aluno", "Idade",
-                   "Série", "Turno",
-                   "Contato", "Endereço"]
-        for titulo, campo in enumerate(campo_texto):
-            layoutca.addRow(str(titulos[titulo]), campo)
+        self.layoutca = QFormLayout()
+        self.setLayout(self.layoutca)
+        self.campo_texto = [nome := QLineEdit(), idade := QSpinBox(),
+                            serie := QLineEdit(), turno := QLineEdit(),
+                            contato := QLineEdit(), endereco := QLineEdit()]
+        self.titulos = ["Nome Aluno", "Idade",
+                        "Série", "Turno", "Contato", "Endereço"]
+        for titulo, campo in enumerate(self.campo_texto):
+            self.layoutca.addRow(str(self.titulos[titulo]), campo)
 
-        botoes_box = QDialogButtonBox(
+        self.botoes_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
             )
 
-        layoutca.addWidget(botoes_box)
-        botoes_box.accepted.connect(self.faz_slot(
-            biblioteca.cadastra_aluno,
-            nome,
-            idade,
-            serie,
-            turno,
-            contato,
-            endereco
+        self.layoutca.addWidget(self.botoes_box)
+        self.botoes_box.accepted.connect(self.faz_slot(
+            self.biblioteca.cadastra_aluno,
+            nome, idade, serie,
+            turno, contato, endereco
         ))
 
-        botoes_box.rejected.connect(self.reject)
+        self.botoes_box.rejected.connect(self.reject)
 
     def faz_slot(self, func, *args: Botao):
         def slot():
             n, i, s, t, c, e = args
-            msg = func(n.text(),
-                       i.text(),
-                       s.text(),
-                       t.text(),
-                       c.text(),
-                       e.text())
+            msg = func(n.text(), i.text(), s.text(),
+                       t.text(), c.text(), e.text())
             for b in args:
                 b.clear()
             mensagem = QMessageBox()
@@ -470,10 +438,50 @@ class JanelaCL(QDialog):
         b_box.rejected.connect(self.reject)
 
 
-# class JanelaAA(JanelaCA):
-#     def __init__(self, *args, **kwargs) -> None:
-#         super().__init__(*args, **kwargs)
-#         self.setWindowTitle("Alteração de Cadastro - Aluno")
+class JanelaAteraAluno(QDialog):
+    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        biblioteca = _biblioteca
+        self.setWindowTitle("Altera Cadastro - Aluno")
+        self.setMinimumSize(600, 350)
+        layoutaa = QFormLayout()
+        self.setLayout(layoutaa)
+        campo_texto = [_id := QSpinBox(), nome := QLineEdit(),
+                       idade := QSpinBox(), serie := QLineEdit(),
+                       turno := QLineEdit(), contato := QLineEdit(),
+                       endereco := QLineEdit()]
+        _id.setRange(0, 999999)
+        titulos = ["ID", "Nome Aluno", "Idade",
+                   "Série", "Turno", "Contato", "Endereço"]
+        for titulo, campo in enumerate(campo_texto):
+            layoutaa.addRow(str(titulos[titulo]), campo)
+
+        self.botoes_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            )
+
+        layoutaa.addWidget(self.botoes_box)
+        self.botoes_box.accepted.connect(self.faz_slot(
+            biblioteca.altera_aluno,
+            _id, nome, idade, serie,
+            turno, contato, endereco
+        ))
+
+        self.botoes_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, *args: Botao):
+        def slot():
+            __id, n, i, s, t, c, e = args
+            msg = func(__id.text(), n.text(), i.text(), s.text(),
+                       t.text(), c.text(), e.text())
+            for b in args:
+                b.clear()
+            mensagem = QMessageBox()
+            mensagem.setWindowTitle("Cadastro atualizado!")
+            mensagem.setIcon(mensagem.Icon.Information)
+            mensagem.setText(msg)
+            mensagem.exec()
+        return slot
 
 
 class JanelaAL(JanelaCL):
