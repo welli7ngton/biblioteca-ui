@@ -122,12 +122,10 @@ class Biblioteca:
 
         return chave, self.emprestimos[chave]
 
-    def fazer_devolucao(self):
+    def fazer_devolucao(self, chave):
 
-        c = input("Digite a chave para realizar a devolução: ")
-        self.emprestimos.pop(c)
-        self.id_emprestimo.pop(c)
-        print("Devolução realizada.")
+        self.emprestimos.pop(chave)
+        self.id_emprestimo.pop(chave)
         self.exportacao(EMPRESTIMOS, self.emprestimos)
         self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
 
@@ -148,7 +146,7 @@ class JanelaPrincipal(QMainWindow):
         self.janelaAA = JanelaAteraAluno(self.b1)
         self.janelaAL = JanelaAlteraLivro(self.b1)
         self.janelaEP = JanelaEmprestimo(self.b1)
-        self.janelaDV = JanelaDV()
+        self.janelaDV = JanelaDV(self.b1)
 
         # Criando os layouts da janela principal
         self.meuLayout1 = QVBoxLayout()
@@ -248,7 +246,7 @@ class JanelaPrincipal(QMainWindow):
         """
 
         self.calendario.setStyleSheet(qss)
-        self.calendario.setFixedSize(800, 700)
+        self.calendario.setFixedSize(600, 600)
 
     def criabotoes(self):
         self.CA = Botao("1 - Cadastra Aluno")
@@ -494,6 +492,8 @@ class JanelaEmprestimo(QDialog):
         def slot():
             i, l, d = args
             chave, msg = func(i.text(), l.text(), d.text())
+            for b in args:
+                b.clear()
             mensagem = QMessageBox()
             mensagem.setWindowTitle("Empréstimo Realizado!")
             mensagem.setIcon(mensagem.Icon.Information)
@@ -506,28 +506,44 @@ class JanelaEmprestimo(QDialog):
 
 
 class JanelaDV(QDialog):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
         self.setWindowTitle("Devolução")
-        self.setMinimumSize(600, 800)
+        self.setMinimumSize(600, 350)
         layoutdv = QFormLayout()
         self.setLayout(layoutdv)
-        botao_id = QSpinBox()
-        botao_id.setRange(0, 9999999)
-        layoutdv.addRow("ID do ALuno:", botao_id)
-        layoutdv.addRow("Nome Aluno:", QLineEdit())
 
-        botao_chave = QSpinBox()
-        botao_chave.setRange(0, 9999999)
-        layoutdv.addRow("Chave:", botao_chave)
+        layoutdv.addRow("Chave da Devolução:", chave := QSpinBox())
+        chave.setRange(0, 9999999)
 
         b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        b_box.setAccessibleName("teste")
         layoutdv.addWidget(b_box)
 
-        b_box.accepted.connect(self.accept)
+        b_box.accepted.connect(self.faz_slot(
+            biblioteca.fazer_devolucao,
+            chave
+        ))
         b_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, chave):
+        def slot():
+            try:
+                func(chave.text())
+                chave.clear()
+                mensagem = QMessageBox()
+                mensagem.setWindowTitle("Devolução Realizada!")
+                mensagem.setIcon(mensagem.Icon.Information)
+                mensagem.setText("Devolução bem sucedida.")
+                mensagem.exec()
+            except KeyError:
+                mensagem = QMessageBox()
+                mensagem.setWindowTitle("Falha!")
+                mensagem.setIcon(mensagem.Icon.Critical)
+                mensagem.setText(
+                    "Devolução mal sucedida.\nERRO: CHAVE NÃO ENCONTRADA"
+                    )
+                mensagem.exec()
+        return slot
 
 
 if __name__ == "__main__":
