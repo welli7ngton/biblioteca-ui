@@ -353,7 +353,7 @@ class JanelaCadastraAluno(QDialog):
         super().__init__(*args, **kwargs)
         self.biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Aluno")
-        self.setMinimumSize(600, 350)
+        self.setMinimumSize(900, 350)
         self.layoutca = QFormLayout()
         self.setLayout(self.layoutca)
         self.campo_texto = [nome := QLineEdit(), idade := QSpinBox(),
@@ -397,7 +397,7 @@ class JanelaCadastroLivro(QDialog):
         super().__init__(*args, **kwargs)
         biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Livro")
-        self.setMinimumSize(600, 800)
+        self.setMinimumSize(900, 350)
         layoutcl = QFormLayout()
         self.setLayout(layoutcl)
         layoutcl.addRow("Numeração:", numeracao := QSpinBox())
@@ -423,7 +423,16 @@ class JanelaCadastroLivro(QDialog):
     def faz_slot(self, func, *args):
         def slot():
             n, t, g, a, e, q = args
-            func(n.text(), t.text(), g.text(), a.text(), e.text(), q.text())
+            msg = func(
+                n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
+                )
+            for b in args:
+                b.clear()
+            mensagem = QMessageBox()
+            mensagem.setWindowTitle("Cadastro Realizado!")
+            mensagem.setIcon(mensagem.Icon.Information)
+            mensagem.setText(msg)
+            mensagem.exec()
         return slot
 
 
@@ -432,7 +441,7 @@ class JanelaAteraAluno(QDialog):
         super().__init__(*args, **kwargs)
         biblioteca = _biblioteca
         self.setWindowTitle("Altera Cadastro - Aluno")
-        self.setMinimumSize(600, 350)
+        self.setMinimumSize(900, 350)
         layoutaa = QFormLayout()
         self.setLayout(layoutaa)
         campo_texto = [_id := QSpinBox(), nome := QLineEdit(),
