@@ -1,17 +1,20 @@
 import os
 import json
 import sys
+from pathlib import Path
 # from typing import Optional
 import qdarktheme
-from variaveis import CAMINHO_DB_FILES
 from datetime import datetime
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QMainWindow, QCalendarWidget, QVBoxLayout,
-                               QGridLayout, QFormLayout, QWidget, QFrame,
-                               QApplication, QPushButton, QLabel, QDialog,
-                               QLineEdit, QSpinBox, QDateEdit,
-                               QDialogButtonBox, QMessageBox)
+from PySide6.QtWidgets import (
+    QMainWindow, QCalendarWidget, QVBoxLayout,
+    QGridLayout, QFormLayout, QWidget, QFrame,
+    QApplication, QPushButton, QLabel, QDialog,
+    QLineEdit, QSpinBox, QDateEdit,
+    QDialogButtonBox, QMessageBox
+    )
 
+CAMINHO_DB_FILES = Path(__file__).parent / "db_files"
 IDS_ALUNOS = os.path.join(CAMINHO_DB_FILES, "id_alunos.json")
 INFO_ALUNOS = os.path.join(CAMINHO_DB_FILES, "info_alunos.json")
 IDS_LIVROS = os.path.join(CAMINHO_DB_FILES, "id_livros.json")
@@ -94,100 +97,39 @@ class Biblioteca:
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
 
-    def altera_livro(self):
-        while True:
-            numeracao = input("Digite a numeração do livro que quer alterar: ")
-            if numeracao not in self.id_livros:
-                print(
-                    "Livro não cadastrado ou numeração inválida, "
-                    "revise e digite uma numeração válida."
-                    )
-                continue
-            else:
-                print("O livro que vai ser alterado é:")
-                print(self.info_livros[numeracao])
-                print("Digite as alterações:")
+    def altera_livro(self, numeracao, titulo, genero, autor, editora, qtd):
 
-                # cadastro de alterações
-                titulo_livro = input("Digite o título do livro: ")
-                genero = input("Digite o gênero do livro: ")
-                autor = input("Digite o Autor: ")
-                editora = input("Digite a Editora: ")
-                qtd = input("Digite a quantidade: ")
-                while True:
-                    if qtd.isdigit() is False:
-                        qtd = input("Digite um valor válido, um número: ")
-                    else:
-                        qtd = int(qtd)
-                        break
+        self.info_livros[numeracao] = (
+            f"Título: {titulo.capitalize()}, "
+            f"Gênero: {genero.capitalize()}, "
+            f"Autor: {autor.capitalize()}, "
+            f"Editora:  {editora.capitalize()}, Quantidade: {qtd}")
+        self.exportacao(INFO_LIVROS, self.info_livros)
+        return self.info_livros[numeracao]
 
-                # atualizando dados no dicionário
-                self.info_livros[numeracao] = (
-                    f"Título: {titulo_livro.capitalize()}, "
-                    f"Gênero: {genero.capitalize()}, "
-                    f"Autor: {autor.capitalize()}, "
-                    f"Editora:  {editora.capitalize()}, Quantidade: {qtd}")
-                self.exportacao(INFO_LIVROS, self.info_livros)
-                break
+    def fazer_emprestimo(self, _id, livro, devo):
 
-    def fazer_emprestimo(self):
-        # r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
-        # if r in "nN":
-        #     nome = input("Digite o nome do aluno: ")
-        #     for chave, valor in self.info_alunos.items():
-        #         if nome.lower() in valor \
-        #             or nome.capitalize() in valor \
-        #                 or nome.title() in valor:
-        #             print(" ID:", chave, "\n", valor)
-        while True:
-            _id = input("Digite o ID do aluno: ")
+        chave = datetime.now().microsecond
 
-            if _id not in self.info_alunos:
-                print("ID não encontrado, digite um ID válido.")
-                continue
-            else:
-                livro = input("Digite o Livro que será emprestado: ")
-                devo = input("Digite a data para devolução(DD/MM): ")
-                chave = datetime.now().microsecond
+        self.emprestimos[chave] = {
+            "aluno": self.info_alunos[_id],
+            "livro": livro.title(),
+            "devolucao": devo
+        }
+        self.id_emprestimo[chave] = _id
+        self.exportacao(EMPRESTIMOS, self.emprestimos)
+        self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
 
-            self.emprestimos[chave] = (self.info_alunos[_id],
-                                       livro.title(),
-                                       devo
-                                       )
-            print(" Chave da devolução:", chave, "\n", self.emprestimos[chave])
-            self.id_emprestimo[chave] = _id
-            self.exportacao(EMPRESTIMOS, self.emprestimos)
-            self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
-            break
+        return chave, self.emprestimos[chave]
 
     def fazer_devolucao(self):
-        # r = input("Tem conhecimento do ID do aluno? [S]im [N]ão: ")
-        # if r in "nN":
-        #     nome = input("Digite o nome do aluno: ")
-        #     for chave, valor in self.info_alunos.items():
-        #         if nome.lower() in valor \
-        #             or nome.capitalize() in valor \
-        #                 or nome.title() in valor:
-        #             print(" ID:", chave, "\n", valor)
 
-        while True:
-            _id = input("Digite o ID do aluno: ")
-            if _id not in self.id_emprestimo.values():
-                print("O aluno não tem nada para devolver.")
-                return False
-            else:
-                for chave, valor in self.id_emprestimo.items():
-                    print("Chave:", chave) if _id \
-                        in self.id_emprestimo.values() else print()
-                    print("Informações:", self.emprestimos[chave], "\n")
-
-            c = input("Digite a chave para realizar a devolução: ")
-            self.emprestimos.pop(c)
-            self.id_emprestimo.pop(c)
-            print("Devolução realizada.")
-            self.exportacao(EMPRESTIMOS, self.emprestimos)
-            self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
-            break
+        c = input("Digite a chave para realizar a devolução: ")
+        self.emprestimos.pop(c)
+        self.id_emprestimo.pop(c)
+        print("Devolução realizada.")
+        self.exportacao(EMPRESTIMOS, self.emprestimos)
+        self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
 
 
 class JanelaPrincipal(QMainWindow):
@@ -204,8 +146,8 @@ class JanelaPrincipal(QMainWindow):
         self.janelaCA = JanelaCadastraAluno(self.b1)
         self.janelaCL = JanelaCadastroLivro(self.b1)
         self.janelaAA = JanelaAteraAluno(self.b1)
-        # self.janelaAL = JanelaAL()
-        self.janelaEP = JanelaEP()
+        self.janelaAL = JanelaAlteraLivro(self.b1)
+        self.janelaEP = JanelaEmprestimo(self.b1)
         self.janelaDV = JanelaDV()
 
         # Criando os layouts da janela principal
@@ -254,7 +196,7 @@ class JanelaPrincipal(QMainWindow):
 
         self.AA.clicked.connect(self.janelaAA.show)
 
-        # self.AL.clicked.connect(self.janelaAL.show)
+        self.AL.clicked.connect(self.janelaAL.show)
 
         self.EP.clicked.connect(self.janelaEP.show)
 
@@ -409,7 +351,6 @@ class JanelaCadastroLivro(QDialog):
         layoutcl.addRow("Quantidade:", qtd := QSpinBox())
         qtd.setRange(0, 999)
         b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        b_box.setAccessibleName("teste")
         layoutcl.addWidget(b_box)
 
         b_box.accepted.connect(
@@ -482,36 +423,86 @@ class JanelaAteraAluno(QDialog):
         return slot
 
 
-# class JanelaAL(JanelaCL):
-#     def __init__(self, *args, **kwargs) -> None:
-#         super().__init__(*args, **kwargs)
-#         self.setWindowTitle("Alteração de Cadastro - livro")
-
-
-class JanelaEP(QDialog):
-    def __init__(self, *args, **kwargs) -> None:
+class JanelaAlteraLivro(QDialog):
+    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        biblioteca = _biblioteca
+        self.setWindowTitle("Altera Cadastro - Livro")
+        self.setMinimumSize(900, 350)
+        layoutcl = QFormLayout()
+        self.setLayout(layoutcl)
+        layoutcl.addRow("Numeração:", numeracao := QSpinBox())
+        numeracao.setRange(0, 9999999)
+        layoutcl.addRow("Titulo Livro:", titulo := QLineEdit())
+        layoutcl.addRow("Genero:", genero := QLineEdit())
+        layoutcl.addRow("Autor:", autor := QLineEdit())
+        layoutcl.addRow("Editora:", editora := QLineEdit())
+        layoutcl.addRow("Quantidade:", qtd := QSpinBox())
+        qtd.setRange(0, 999)
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layoutcl.addWidget(b_box)
 
+        b_box.accepted.connect(
+            self.faz_slot(
+                biblioteca.altera_livro,
+                numeracao, titulo, genero, autor, editora, qtd
+            )
+        )
+        b_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, *args):
+        def slot():
+            n, t, g, a, e, q = args
+            msg = func(
+                n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
+                )
+            for b in args:
+                b.clear()
+            mensagem = QMessageBox()
+            mensagem.setWindowTitle("Cadastro Alterado!")
+            mensagem.setIcon(mensagem.Icon.Information)
+            mensagem.setText(msg)
+            mensagem.exec()
+        return slot
+
+
+class JanelaEmprestimo(QDialog):
+    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        biblioteca = _biblioteca
         self.setWindowTitle("Empréstimo")
-        self.setMinimumSize(600, 800)
+        self.setMinimumSize(900, 350)
         layoutep = QFormLayout()
         self.setLayout(layoutep)
-        botao_id = QSpinBox()
-        botao_id.setRange(0, 9999999)
-        layoutep.addRow("ID do ALuno:", botao_id)
-        layoutep.addRow("Nome Aluno:", QLineEdit())
 
-        layoutep.addRow("Livro:", QLineEdit())
-        botao_data = QDateEdit()
-        botao_data.setCalendarPopup(True)
-        layoutep.addRow("Devolução:", botao_data)
+        layoutep.addRow("ID do ALuno:", _id := QSpinBox())
+        _id.setRange(0, 9999999)
+
+        layoutep.addRow("Livro:", livro := QLineEdit())
+        layoutep.addRow("Devolução:", data := QDateEdit())
+        data.setCalendarPopup(True)
 
         b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-        b_box.setAccessibleName("teste")
         layoutep.addWidget(b_box)
 
-        b_box.accepted.connect(self.accept)
+        b_box.accepted.connect(self.faz_slot(
+            biblioteca.fazer_emprestimo, _id, livro, data
+        ))
         b_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, *args):
+        def slot():
+            i, l, d = args
+            chave, msg = func(i.text(), l.text(), d.text())
+            mensagem = QMessageBox()
+            mensagem.setWindowTitle("Empréstimo Realizado!")
+            mensagem.setIcon(mensagem.Icon.Information)
+            mensagem.setText(
+                f"CHAVE DA DEVOLUÇÃO: {chave}\nINFO ALUNO: {msg}"
+                )
+
+            mensagem.exec()
+        return slot
 
 
 class JanelaDV(QDialog):
