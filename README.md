@@ -32,13 +32,11 @@ Nota: Ainda em desenvolvimento
 
 ### Para executar o Sistema de Gerenciamento de Biblioteca, siga os passos abaixo:
 
-  Certifique-se de ter o Python 3.x instalado em seu sistema.
+  Certifique-se de ter o Python 3.10 instalado em seu sistema.
 
   Instale as dependências do projeto. No terminal, digite:
 
-  `pip install PySide6 pyqtdarktheme`
-
-  `pip install pyqtdarktheme`
+  `pip install -r requirements.txt`
 
   Faça o download do projeto através do repositório [[Biblioteca-GUI](https://github.com/welli7ngton/Biblioteca-GUI.git)].
 

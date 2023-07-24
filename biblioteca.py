@@ -146,7 +146,7 @@ class JanelaPrincipal(QMainWindow):
         self.janelaAA = JanelaAteraAluno(self.b1)
         self.janelaAL = JanelaAlteraLivro(self.b1)
         self.janelaEP = JanelaEmprestimo(self.b1)
-        self.janelaDV = JanelaDV(self.b1)
+        self.janelaDV = JanelaDevolucao(self.b1)
 
         # Criando os layouts da janela principal
         self.meuLayout1 = QVBoxLayout()
@@ -255,11 +255,6 @@ class JanelaPrincipal(QMainWindow):
         self.AL = Botao("4 - Altera Livro")
         self.EP = Botao("5 - Empréstimo")
         self.DV = Botao("6 - Devoluçao")
-
-    def fazSlot(self, funcao):
-        def _slot():
-            funcao()
-        return _slot
 
 
 class BarraTitulo(QFrame):
@@ -505,7 +500,7 @@ class JanelaEmprestimo(QDialog):
         return slot
 
 
-class JanelaDV(QDialog):
+class JanelaDevolucao(QDialog):
     def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setWindowTitle("Devolução")
