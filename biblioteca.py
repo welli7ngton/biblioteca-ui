@@ -36,12 +36,12 @@ class Biblioteca:
         self.id_emprestimo = self.importacao(ID_EMPRESTIMO)
 
     def importacao(self, caminho):
-        with open(caminho, "r") as arq:
+        with open(caminho, "r", encoding="utf-8") as arq:
             dados = json.load(arq)
         return dados
 
     def exportacao(self, caminho, dados):
-        with open(caminho, "w") as arq:
+        with open(caminho, "w", encoding="utf-8") as arq:
             json.dump(dados, arq, ensure_ascii=False, indent=2)
 
     def cadastra_aluno(
@@ -62,50 +62,26 @@ class Biblioteca:
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
 
-    def cadastra_livro(self):
+    def cadastra_livro(
+            self, numeracao, titulo, genero, autor, editora, qtd
+            ):
 
-        titulo_livro = input("Digite o título do livro: ")
-        genero = input("Digite o gênero do livro: ")
-        autor = input("Digite o Autor: ")
-        editora = input("Digite a Editora: ")
-        qtd = input("Digite a quantidade: ")
-
-        # verificando se a quantidade é um valor numérico
-        while True:
-            if qtd.isdigit() is False:
-                qtd = input("Digite um valor válido, um número: ")
-            else:
-                break
-        _id = input("Digite a numeração do livro: ")
-        # verificando se a numeração do livro é um valor numérico
-        while True:
-            if _id.isdigit():
-                while True:
-                    if _id not in self.id_livros and _id.isdigit():
-                        break
-                    else:
-                        print("Livro já cadastrado ou numeração inválida.")
-                        _id = input("Digite uma numeração válida: ")
-                break
-            else:
-                print("Digite uma numeração válida.")
-        # atualizando dicionário
-        self.info_livros[_id] = (
-            f"Título: {titulo_livro.capitalize()}, "
+        self.info_livros[numeracao] = (
+            f"Título: {titulo.capitalize()}, "
             f"Gênero: {genero.capitalize()}, "
             f"Autor: {autor.capitalize()}, "
             f"Editora:  {editora.capitalize()}, "
-            f"Quantidade: {qtd}, Numeração: {_id}"
+            f"Quantidade: {qtd}, Numeração: {numeracao}"
         )
-        self.id_livros.append(_id)
+        self.id_livros.append(numeracao)
 
-        print()
         print("As informações do livro cadasrtado são:")
-        print("NUMERAÇÃO: ", _id)
-        print(self.info_livros[_id])
-        print()
+        print("NUMERAÇÃO: ", numeracao)
+        print(self.info_livros[numeracao])
+
         self.exportacao(IDS_LIVROS, self.id_livros)
         self.exportacao(INFO_LIVROS, self.info_livros)
+        return self.info_livros[numeracao]
 
     def altera_aluno(
             self, _id: str, nome: str, idade: str, serie: str,
@@ -226,9 +202,9 @@ class JanelaPrincipal(QMainWindow):
 
         # Criando janelas para cada botão
         self.janelaCA = JanelaCadastraAluno(self.b1)
-        self.janelaCL = JanelaCL()
+        self.janelaCL = JanelaCadastroLivro(self.b1)
         self.janelaAA = JanelaAteraAluno(self.b1)
-        self.janelaAL = JanelaAL()
+        # self.janelaAL = JanelaAL()
         self.janelaEP = JanelaEP()
         self.janelaDV = JanelaDV()
 
@@ -278,7 +254,7 @@ class JanelaPrincipal(QMainWindow):
 
         self.AA.clicked.connect(self.janelaAA.show)
 
-        self.AL.clicked.connect(self.janelaAL.show)
+        # self.AL.clicked.connect(self.janelaAL.show)
 
         self.EP.clicked.connect(self.janelaEP.show)
 
@@ -401,7 +377,7 @@ class JanelaCadastraAluno(QDialog):
 
         self.botoes_box.rejected.connect(self.reject)
 
-    def faz_slot(self, func, *args: Botao):
+    def faz_slot(self, func, *args):
         def slot():
             n, i, s, t, c, e = args
             msg = func(n.text(), i.text(), s.text(),
@@ -416,26 +392,39 @@ class JanelaCadastraAluno(QDialog):
         return slot
 
 
-class JanelaCL(QDialog):
-    def __init__(self, *args, **kwargs) -> None:
+class JanelaCadastroLivro(QDialog):
+    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
+        biblioteca = _biblioteca
         self.setWindowTitle("Cadastro de Livro")
         self.setMinimumSize(600, 800)
         layoutcl = QFormLayout()
         self.setLayout(layoutcl)
-        layoutcl.addRow("Titulo Livro:", QLineEdit())
-        layoutcl.addRow("Genero:", QLineEdit())
-        layoutcl.addRow("Autor:", QLineEdit())
-        layoutcl.addRow("Editora:", QLineEdit())
-        layoutcl.addRow("Quantidade:", QSpinBox())
-
+        layoutcl.addRow("Numeração:", numeracao := QSpinBox())
+        numeracao.setRange(0, 9999999)
+        layoutcl.addRow("Titulo Livro:", titulo := QLineEdit())
+        layoutcl.addRow("Genero:", genero := QLineEdit())
+        layoutcl.addRow("Autor:", autor := QLineEdit())
+        layoutcl.addRow("Editora:", editora := QLineEdit())
+        layoutcl.addRow("Quantidade:", qtd := QSpinBox())
+        qtd.setRange(0, 999)
         b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         b_box.setAccessibleName("teste")
         layoutcl.addWidget(b_box)
 
-        b_box.accepted.connect(self.accept)
+        b_box.accepted.connect(
+            self.faz_slot(
+                biblioteca.cadastra_livro,
+                numeracao, titulo, genero, autor, editora, qtd
+            )
+        )
         b_box.rejected.connect(self.reject)
+
+    def faz_slot(self, func, *args):
+        def slot():
+            n, t, g, a, e, q = args
+            func(n.text(), t.text(), g.text(), a.text(), e.text(), q.text())
+        return slot
 
 
 class JanelaAteraAluno(QDialog):
@@ -484,10 +473,10 @@ class JanelaAteraAluno(QDialog):
         return slot
 
 
-class JanelaAL(JanelaCL):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.setWindowTitle("Alteração de Cadastro - livro")
+# class JanelaAL(JanelaCL):
+#     def __init__(self, *args, **kwargs) -> None:
+#         super().__init__(*args, **kwargs)
+#         self.setWindowTitle("Alteração de Cadastro - livro")
 
 
 class JanelaEP(QDialog):
