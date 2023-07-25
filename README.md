@@ -5,7 +5,6 @@ O Sistema de Gerenciamento de Biblioteca é uma aplicação desenvolvida 100% em
 
 O projeto foi desenvolvido do zero e é disponibilizado de forma gratuita por mim, com o intuito de contribuir para o acesso à educação e ao conhecimento.
 
-Nota: Ainda em desenvolvimento
 
 ## Requisitos
 

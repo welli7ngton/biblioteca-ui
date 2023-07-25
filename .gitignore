@@ -3,7 +3,7 @@ __localcode
 chromedriver
 mysql_206
 .env
-db_files
+# db_files
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
