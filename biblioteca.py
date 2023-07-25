@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QMainWindow, QCalendarWidget, QVBoxLayout,
     QGridLayout, QFormLayout, QWidget, QFrame,
     QApplication, QPushButton, QLabel, QDialog,
-    QLineEdit, QSpinBox, QDateEdit,
+    QLineEdit, QSpinBox, QDateEdit, QListWidget,
     QDialogButtonBox, QMessageBox
     )
 
@@ -218,6 +218,16 @@ class JanelaPrincipal(QMainWindow):
         self.layout_botoes.addWidget(self.EP, 2, 0)
         self.layout_botoes.addWidget(self.DV, 2, 1)
 
+        self.layout_botoes.addWidget(
+            alunos := Botao("Listagem Alunos"),
+            3, 0, 1, 2)
+        self.layout_botoes.addWidget(
+            livros := Botao("Listagem Livros"),
+            4, 0, 1, 2)
+        self.layout_botoes.addWidget(
+            emprestimos := Botao("Listagem Empréstimos"),
+            5, 0, 1, 2)
+
         self.config_style()
 
         self.CA.clicked.connect(self.janelaCA.show)
@@ -231,6 +241,19 @@ class JanelaPrincipal(QMainWindow):
         self.EP.clicked.connect(self.janelaEP.show)
 
         self.DV.clicked.connect(self.janelaDV.show)
+
+        alunos.clicked.connect(self.faz_slot(
+            self.listagem_dados,
+            self.b1.info_alunos
+        ))
+        livros.clicked.connect(self.faz_slot(
+            self.listagem_dados,
+            self.b1.info_livros
+        ))
+        emprestimos.clicked.connect(self.faz_slot(
+            self.listagem_dados,
+            self.b1.emprestimos
+        ))
 
     def config_style(self):
         # Setando tamanho de 1200x800 enquanto trabalho no projeto
@@ -278,7 +301,7 @@ class JanelaPrincipal(QMainWindow):
         """
 
         self.calendario.setStyleSheet(qss)
-        self.calendario.setFixedSize(600, 600)
+        self.calendario.setFixedSize(500, 500)
 
     def criabotoes(self):
         self.CA = Botao("1 - Cadastra Aluno")
@@ -287,6 +310,24 @@ class JanelaPrincipal(QMainWindow):
         self.AL = Botao("4 - Altera Livro")
         self.EP = Botao("5 - Empréstimo")
         self.DV = Botao("6 - Devoluçao")
+
+    def listagem_dados(self, dados: dict):
+        _janela = QDialog()
+        _janela.setWindowTitle("Listagem dos dados")
+        _janela.setFixedSize(1000, 800)
+        _layout = QVBoxLayout()
+        _lista = QListWidget()
+        for chave, dado in dados.items():
+            _lista.addItem((f"ID: {chave}\n {dado}"))
+            _lista.addItem("\n")
+        _layout.addWidget(_lista)
+        _janela.setLayout(_layout)
+        _janela.exec()
+
+    def faz_slot(self, func, dicionario):
+        def slot():
+            func(dicionario)
+        return slot
 
 
 class BarraTitulo(QFrame):
@@ -372,7 +413,7 @@ class JanelaCadastroLivro(QDialog):
         layoutcl.addRow("Autor:", autor := QLineEdit())
         layoutcl.addRow("Editora:", editora := QLineEdit())
         layoutcl.addRow("Quantidade:", qtd := QSpinBox())
-        qtd.setRange(0, 999)
+        qtd.setRange(0, 9999)
         b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         layoutcl.addWidget(b_box)
 
