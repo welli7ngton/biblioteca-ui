@@ -25,7 +25,8 @@ ANO_ATUAL = datetime.now().year
 MES_ATUAL = datetime.now().month
 DIA_ATUAL = datetime.now().day
 
-def fazMsgBox(titulo: str,texto: str, critical: bool):
+
+def faz_msg_box(titulo: str, texto: str, critical: bool):
     m = QMessageBox()
     m.setWindowTitle(titulo)
     if critical:
@@ -34,6 +35,18 @@ def fazMsgBox(titulo: str,texto: str, critical: bool):
         m.setIcon(m.Icon.Information)
     m.setText(texto)
     m.exec()
+
+
+def verifica_campos(*campos: QLineEdit | QSpinBox):
+    for campo in campos:
+        if not campo.text():
+            faz_msg_box(
+                "Campos vazios!",
+                "Verifique os campos dos dados.",
+                True
+                )
+            return
+    return True
 
 
 class Biblioteca:
@@ -67,10 +80,14 @@ class Biblioteca:
         self.id_alunos.append(_id)
 
         self.info_alunos[_id] = {
-            f"ID: {_id}, Nome: {nome.title()}, Série: {serie}, "
-            f"Turno: {turno.title()}, Idade: {idade}, Contato: {contato}, "
-            f"Endereço: {endereco.title()}"
-        }
+            "ID": _id,
+            "Nome": nome.title(),
+            "Série": serie,
+            "Turno": turno.title(),
+            "Idade": idade,
+            "Contato": contato,
+            "Endereço": endereco.title()
+            }
         self.exportacao(IDS_ALUNOS, self.id_alunos)
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
@@ -80,18 +97,15 @@ class Biblioteca:
             autor: str, editora: str, qtd: str
             ):
 
-        self.info_livros[numeracao] = (
-            f"Título: {titulo.capitalize()}, "
-            f"Gênero: {genero.capitalize()}, "
-            f"Autor: {autor.capitalize()}, "
-            f"Editora:  {editora.capitalize()}, "
-            f"Quantidade: {qtd}, Numeração: {numeracao}"
-        )
+        self.info_livros[numeracao] = {
+            "Título": titulo.capitalize(),
+            "Gênero": genero.capitalize(),
+            "Autor": autor.capitalize(),
+            "Editora": editora.capitalize(),
+            "Quantidade": qtd,
+            "Numeração": numeracao
+            }
         self.id_livros.append(numeracao)
-
-        print("As informações do livro cadasrtado são:")
-        print("NUMERAÇÃO: ", numeracao)
-        print(self.info_livros[numeracao])
 
         self.exportacao(IDS_LIVROS, self.id_livros)
         self.exportacao(INFO_LIVROS, self.info_livros)
@@ -101,7 +115,7 @@ class Biblioteca:
             self, _id: str, nome: str, idade: str, serie: str,
             turno: str, contato: str, endereco: str
             ):
-        
+
         if _id not in self.id_alunos:
             return None
 
@@ -332,14 +346,14 @@ class JanelaCadastraAluno(QDialog):
     def faz_slot(self, func, *args):
         def slot():
             n, i, s, t, c, e = args
-            msg = func(n.text(), i.text(), s.text(),
-                       t.text(), c.text(), e.text())
-            for b in args:
-                b.clear()
-            fazMsgBox("Cadastro realizado!",
-                      msg,
-                      False
-                      )
+            if verifica_campos(*args):
+                msg = func(n.text(), i.text(), s.text(),
+                           t.text(), c.text(), e.text())
+                for b in args:
+                    b.clear()
+                faz_msg_box(
+                    "Cadastro realizado!", str(msg), False
+                        )
         return slot
 
 
@@ -373,16 +387,15 @@ class JanelaCadastroLivro(QDialog):
     def faz_slot(self, func, *args):
         def slot():
             n, t, g, a, e, q = args
-            msg = func(
-                n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
-                )
-            for b in args:
-                b.clear()
-            fazMsgBox(
-                "Cadastro Realizado!",
-                msg,
-                False
-                )
+            if verifica_campos(*args):
+                msg = func(
+                    n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
+                    )
+                for b in args:
+                    b.clear()
+                faz_msg_box(
+                    "Cadastro Realizado!", str(msg), False
+                    )
         return slot
 
 
@@ -407,7 +420,7 @@ class JanelaAteraAluno(QDialog):
         self.botoes_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
             )
-        
+
         layoutaa.addWidget(self.botoes_box)
         self.botoes_box.accepted.connect(self.faz_slot(
             biblioteca.altera_aluno,
@@ -420,14 +433,15 @@ class JanelaAteraAluno(QDialog):
     def faz_slot(self, func, *args: Botao):
         def slot():
             __id, n, i, s, t, c, e = args
-            msg = func(__id.text(), n.text(), i.text(), s.text(),
-                    t.text(), c.text(), e.text())
-            if msg is None:
-                fazMsgBox("ERRO!", "O ID digitado não existe.", True)
-                return slot
-            for b in args:
-                b.clear()
-            fazMsgBox("Cadastro atualizado!", msg, False)
+            if verifica_campos(*args):
+                msg = func(__id.text(), n.text(), i.text(), s.text(),
+                           t.text(), c.text(), e.text())
+                if msg is None:
+                    faz_msg_box("ERRO!", "O ID digitado não existe.", True)
+                    return slot
+                for b in args:
+                    b.clear()
+                faz_msg_box("Cadastro atualizado!", msg, False)
         return slot
 
 
@@ -461,15 +475,16 @@ class JanelaAlteraLivro(QDialog):
     def faz_slot(self, func, *args):
         def slot():
             n, t, g, a, e, q = args
-            msg = func(
-                n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
-                )
-            for b in args:
-                b.clear()
-            if msg is None:
-                fazMsgBox("ERRO!", "ID não encontrado.", True)
-                return
-            fazMsgBox("Cadastro Alterado!", msg, False)
+            if verifica_campos(*args):
+                msg = func(
+                    n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
+                    )
+                for b in args:
+                    b.clear()
+                if msg is None:
+                    faz_msg_box("ERRO!", "ID não encontrado.", True)
+                    return
+                faz_msg_box("Cadastro Alterado!", msg, False)
         return slot
 
 
@@ -500,14 +515,18 @@ class JanelaEmprestimo(QDialog):
     def faz_slot(self, func, *args):
         def slot():
             i, l, d = args
-            chave, msg = func(i.text(), l.text(), d.text())
-            for b in args:
-                b.clear()
-            fazMsgBox(
-                "Empréstimo Realizado!",
-                f"CHAVE DA DEVOLUÇÃO: {chave}\nINFO ALUNO: {msg}",
-                False
-                )
+            if verifica_campos(*args):
+                try:
+                    chave, msg = func(i.text(), l.text(), d.text())
+                    for b in args:
+                        b.clear()
+                    faz_msg_box(
+                        "Empréstimo Realizado!",
+                        f"CHAVE DA DEVOLUÇÃO: {chave}\nINFO ALUNO: {msg}",
+                        False
+                        )
+                except KeyError:
+                    faz_msg_box("ERRO!", "ID de aluno não encontrado.", True)
         return slot
 
 
@@ -536,13 +555,13 @@ class JanelaDevolucao(QDialog):
             try:
                 func(chave.text())
                 chave.clear()
-                fazMsgBox(
+                faz_msg_box(
                     "Devolução Realizada!",
                     "Devolução bem sucedida.",
                     False
                     )
             except KeyError:
-                fazMsgBox(
+                faz_msg_box(
                     "Falha!",
                     "Devolução mal sucedida.\nERRO: CHAVE NÃO ENCONTRADA",
                     True
