@@ -25,6 +25,16 @@ ANO_ATUAL = datetime.now().year
 MES_ATUAL = datetime.now().month
 DIA_ATUAL = datetime.now().day
 
+def fazMsgBox(titulo: str,texto: str, critical: bool):
+    m = QMessageBox()
+    m.setWindowTitle(titulo)
+    if critical:
+        m.setIcon(m.Icon.Critical)
+    else:
+        m.setIcon(m.Icon.Information)
+    m.setText(texto)
+    m.exec()
+
 
 class Biblioteca:
 
@@ -38,12 +48,12 @@ class Biblioteca:
         self.emprestimos = self.importacao(EMPRESTIMOS)
         self.id_emprestimo = self.importacao(ID_EMPRESTIMO)
 
-    def importacao(self, caminho):
+    def importacao(self, caminho: str):
         with open(caminho, "r", encoding="utf-8") as arq:
             dados = json.load(arq)
         return dados
 
-    def exportacao(self, caminho, dados):
+    def exportacao(self, caminho: str, dados: dict):
         with open(caminho, "w", encoding="utf-8") as arq:
             json.dump(dados, arq, ensure_ascii=False, indent=2)
 
@@ -56,17 +66,18 @@ class Biblioteca:
             return False
         self.id_alunos.append(_id)
 
-        self.info_alunos[_id] = (
+        self.info_alunos[_id] = {
             f"ID: {_id}, Nome: {nome.title()}, Série: {serie}, "
             f"Turno: {turno.title()}, Idade: {idade}, Contato: {contato}, "
             f"Endereço: {endereco.title()}"
-        )
+        }
         self.exportacao(IDS_ALUNOS, self.id_alunos)
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
 
     def cadastra_livro(
-            self, numeracao, titulo, genero, autor, editora, qtd
+            self, numeracao: str, titulo: str, genero: str,
+            autor: str, editora: str, qtd: str
             ):
 
         self.info_livros[numeracao] = (
@@ -88,7 +99,11 @@ class Biblioteca:
 
     def altera_aluno(
             self, _id: str, nome: str, idade: str, serie: str,
-            turno: str, contato: str, endereco: str):
+            turno: str, contato: str, endereco: str
+            ):
+        
+        if _id not in self.id_alunos:
+            return None
 
         self.info_alunos[_id] = (
             f"Nome: {nome.title()}, Série: {serie}, "
@@ -97,8 +112,11 @@ class Biblioteca:
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
 
-    def altera_livro(self, numeracao, titulo, genero, autor, editora, qtd):
-
+    def altera_livro(self, numeracao: str, titulo: str, genero: str,
+                     autor: str, editora: str, qtd: str
+                     ):
+        if numeracao not in self.id_livros:
+            return None
         self.info_livros[numeracao] = (
             f"Título: {titulo.capitalize()}, "
             f"Gênero: {genero.capitalize()}, "
@@ -107,9 +125,9 @@ class Biblioteca:
         self.exportacao(INFO_LIVROS, self.info_livros)
         return self.info_livros[numeracao]
 
-    def fazer_emprestimo(self, _id, livro, devo):
+    def fazer_emprestimo(self, _id: str, livro: str, devo: str):
 
-        chave = datetime.now().microsecond
+        chave = str(datetime.now().microsecond)
 
         self.emprestimos[chave] = {
             "aluno": self.info_alunos[_id],
@@ -122,7 +140,7 @@ class Biblioteca:
 
         return chave, self.emprestimos[chave]
 
-    def fazer_devolucao(self, chave):
+    def fazer_devolucao(self, chave: str):
 
         self.emprestimos.pop(chave)
         self.id_emprestimo.pop(chave)
@@ -260,7 +278,6 @@ class JanelaPrincipal(QMainWindow):
 class BarraTitulo(QFrame):
     def __init__(self):
         super().__init__()
-        # self.setAutoFillBackground(True)
         self.setFixedHeight(45)
         self.setStyleSheet("background-color: #1e81b0; color: white;")
 
@@ -284,9 +301,9 @@ class Botao(QPushButton):
 
 # classes para as janelas secundárias apenas com estilos
 class JanelaCadastraAluno(QDialog):
-    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.biblioteca = _biblioteca
+
         self.setWindowTitle("Cadastro de Aluno")
         self.setMinimumSize(900, 350)
         self.layoutca = QFormLayout()
@@ -305,7 +322,7 @@ class JanelaCadastraAluno(QDialog):
 
         self.layoutca.addWidget(self.botoes_box)
         self.botoes_box.accepted.connect(self.faz_slot(
-            self.biblioteca.cadastra_aluno,
+            biblioteca.cadastra_aluno,
             nome, idade, serie,
             turno, contato, endereco
         ))
@@ -319,18 +336,17 @@ class JanelaCadastraAluno(QDialog):
                        t.text(), c.text(), e.text())
             for b in args:
                 b.clear()
-            mensagem = QMessageBox()
-            mensagem.setWindowTitle("Cadastro realizado!")
-            mensagem.setIcon(mensagem.Icon.Information)
-            mensagem.setText(msg)
-            mensagem.exec()
+            fazMsgBox("Cadastro realizado!",
+                      msg,
+                      False
+                      )
         return slot
 
 
 class JanelaCadastroLivro(QDialog):
-    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        biblioteca = _biblioteca
+
         self.setWindowTitle("Cadastro de Livro")
         self.setMinimumSize(900, 350)
         layoutcl = QFormLayout()
@@ -362,18 +378,18 @@ class JanelaCadastroLivro(QDialog):
                 )
             for b in args:
                 b.clear()
-            mensagem = QMessageBox()
-            mensagem.setWindowTitle("Cadastro Realizado!")
-            mensagem.setIcon(mensagem.Icon.Information)
-            mensagem.setText(msg)
-            mensagem.exec()
+            fazMsgBox(
+                "Cadastro Realizado!",
+                msg,
+                False
+                )
         return slot
 
 
 class JanelaAteraAluno(QDialog):
-    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        biblioteca = _biblioteca
+
         self.setWindowTitle("Altera Cadastro - Aluno")
         self.setMinimumSize(900, 350)
         layoutaa = QFormLayout()
@@ -391,7 +407,7 @@ class JanelaAteraAluno(QDialog):
         self.botoes_box = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel
             )
-
+        
         layoutaa.addWidget(self.botoes_box)
         self.botoes_box.accepted.connect(self.faz_slot(
             biblioteca.altera_aluno,
@@ -405,21 +421,20 @@ class JanelaAteraAluno(QDialog):
         def slot():
             __id, n, i, s, t, c, e = args
             msg = func(__id.text(), n.text(), i.text(), s.text(),
-                       t.text(), c.text(), e.text())
+                    t.text(), c.text(), e.text())
+            if msg is None:
+                fazMsgBox("ERRO!", "O ID digitado não existe.", True)
+                return slot
             for b in args:
                 b.clear()
-            mensagem = QMessageBox()
-            mensagem.setWindowTitle("Cadastro atualizado!")
-            mensagem.setIcon(mensagem.Icon.Information)
-            mensagem.setText(msg)
-            mensagem.exec()
+            fazMsgBox("Cadastro atualizado!", msg, False)
         return slot
 
 
 class JanelaAlteraLivro(QDialog):
-    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        biblioteca = _biblioteca
+
         self.setWindowTitle("Altera Cadastro - Livro")
         self.setMinimumSize(900, 350)
         layoutcl = QFormLayout()
@@ -451,18 +466,17 @@ class JanelaAlteraLivro(QDialog):
                 )
             for b in args:
                 b.clear()
-            mensagem = QMessageBox()
-            mensagem.setWindowTitle("Cadastro Alterado!")
-            mensagem.setIcon(mensagem.Icon.Information)
-            mensagem.setText(msg)
-            mensagem.exec()
+            if msg is None:
+                fazMsgBox("ERRO!", "ID não encontrado.", True)
+                return
+            fazMsgBox("Cadastro Alterado!", msg, False)
         return slot
 
 
 class JanelaEmprestimo(QDialog):
-    def __init__(self, _biblioteca: Biblioteca, *args, **kwargs) -> None:
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        biblioteca = _biblioteca
+
         self.setWindowTitle("Empréstimo")
         self.setMinimumSize(900, 350)
         layoutep = QFormLayout()
@@ -489,14 +503,11 @@ class JanelaEmprestimo(QDialog):
             chave, msg = func(i.text(), l.text(), d.text())
             for b in args:
                 b.clear()
-            mensagem = QMessageBox()
-            mensagem.setWindowTitle("Empréstimo Realizado!")
-            mensagem.setIcon(mensagem.Icon.Information)
-            mensagem.setText(
-                f"CHAVE DA DEVOLUÇÃO: {chave}\nINFO ALUNO: {msg}"
+            fazMsgBox(
+                "Empréstimo Realizado!",
+                f"CHAVE DA DEVOLUÇÃO: {chave}\nINFO ALUNO: {msg}",
+                False
                 )
-
-            mensagem.exec()
         return slot
 
 
@@ -525,19 +536,17 @@ class JanelaDevolucao(QDialog):
             try:
                 func(chave.text())
                 chave.clear()
-                mensagem = QMessageBox()
-                mensagem.setWindowTitle("Devolução Realizada!")
-                mensagem.setIcon(mensagem.Icon.Information)
-                mensagem.setText("Devolução bem sucedida.")
-                mensagem.exec()
-            except KeyError:
-                mensagem = QMessageBox()
-                mensagem.setWindowTitle("Falha!")
-                mensagem.setIcon(mensagem.Icon.Critical)
-                mensagem.setText(
-                    "Devolução mal sucedida.\nERRO: CHAVE NÃO ENCONTRADA"
+                fazMsgBox(
+                    "Devolução Realizada!",
+                    "Devolução bem sucedida.",
+                    False
                     )
-                mensagem.exec()
+            except KeyError:
+                fazMsgBox(
+                    "Falha!",
+                    "Devolução mal sucedida.\nERRO: CHAVE NÃO ENCONTRADA",
+                    True
+                    )
         return slot
 
 
