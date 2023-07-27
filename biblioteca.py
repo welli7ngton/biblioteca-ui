@@ -304,12 +304,12 @@ class JanelaPrincipal(QMainWindow):
         self.calendario.setFixedSize(500, 500)
 
     def criabotoes(self):
-        self.CA = Botao("1 - Cadastra Aluno")
-        self.CL = Botao("2 - Cadastra Livro")
-        self.AA = Botao("3 - Altera Aluno")
-        self.AL = Botao("4 - Altera Livro")
-        self.EP = Botao("5 - Empréstimo")
-        self.DV = Botao("6 - Devoluçao")
+        self.CA = Botao("Cadastra Aluno")
+        self.CL = Botao("Cadastra Livro")
+        self.AA = Botao("Altera Aluno")
+        self.AL = Botao("Altera Livro")
+        self.EP = Botao("Empréstimo")
+        self.DV = Botao("Devoluçao")
 
     def listagem_dados(self, dados: dict):
         _janela = QDialog()
