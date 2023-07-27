@@ -8,7 +8,7 @@ O projeto foi desenvolvido do zero e é disponibilizado de forma gratuita por mi
 
 ## Requisitos
 
-  - Python 3.x instalado.
+  - Python 3.10 instalado.
   - PySide6 e pyqtdarktheme instalados (pode ser feito através do pip).
   - Um sistema operacional compatível (Windows, macOS ou Linux).
 
@@ -23,10 +23,11 @@ O projeto foi desenvolvido do zero e é disponibilizado de forma gratuita por mi
     
   - Alteração de Cadastro: Permite a edição das informações de livros e alunos previamente cadastrados, possibilitando a correção de dados incorretos ou desatualizados.
 
-  - Empréstimo de Livros: Permite registrar o empréstimo de livros para alunos, indicando o livro em questão e o aluno que o está pegando emprestado. O sistema também registra a data de empréstimo e a data de devolução prevista.
+  - Empréstimo de Livros: Permite registrar o empréstimo de livros para alunos, indicando o livro em questão e o aluno que o está pegando emprestado. O sistema também registra a data de empréstimo.
 
-  - Devolução de Livros: Permite registrar a devolução de livros por parte dos alunos, atualizando o status do livro para disponível novamente.
-
+  - Devolução de Livros: Permite registrar a devolução de livros por parte dos alunos.
+    
+  - Listagem dos dados cadastrados: Funções que listam os dados dos alunos, livros e empréstimos registrados no sistema.
 ## Execução
 
 ### Para executar o Sistema de Gerenciamento de Biblioteca, siga os passos abaixo:
