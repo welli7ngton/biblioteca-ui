@@ -1,1 +1,29 @@
-{}
+{
+  "0": {
+    "ID": "0",
+    "Nome": "Pedrinho Queimador De Pneu",
+    "Série": "9",
+    "Turno": "Manha",
+    "Idade": "10",
+    "Contato": "8",
+    "Endereço": "Rua 1 Bairro 2"
+  },
+  "1": {
+    "ID": "1",
+    "Nome": "Aquila Menezes",
+    "Série": "9",
+    "Turno": "Tarde",
+    "Idade": "20",
+    "Contato": "88 99",
+    "Endereço": "Rua Bairro Cidade Numero"
+  },
+  "2": {
+    "ID": "2",
+    "Nome": "Pedenrique",
+    "Série": "9",
+    "Turno": "Manha",
+    "Idade": "20",
+    "Contato": "9",
+    "Endereço": "Rua 3"
+  }
+}

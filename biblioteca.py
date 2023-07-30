@@ -119,10 +119,15 @@ class Biblioteca:
         if _id not in self.id_alunos:
             return None
 
-        self.info_alunos[_id] = (
-            f"Nome: {nome.title()}, Série: {serie}, "
-            f"Turno: {turno.title()}, Idade: {idade}, Contato: {contato}, "
-            f"Endereço: {endereco.title()}")
+        self.info_alunos[_id] = {
+            "ID": _id,
+            "Nome": nome.title(),
+            "Série": serie,
+            "Turno": turno.title(),
+            "Idade": idade,
+            "Contato": contato,
+            "Endereço": endereco.title()
+            }
         self.exportacao(INFO_ALUNOS, self.info_alunos)
         return self.info_alunos[_id]
 
@@ -482,6 +487,7 @@ class JanelaAteraAluno(QDialog):
                     return slot
                 for b in args:
                     b.clear()
+                # ERRO: MENSAGEM DE CADASTRO ATUALIZADO NÃO APARECE
                 faz_msg_box("Cadastro atualizado!", msg, False)
         return slot
 

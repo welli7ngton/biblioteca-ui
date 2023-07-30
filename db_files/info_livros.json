@@ -1,1 +1,10 @@
-{}
+{
+  "123": {
+    "Título": "Caçador de feitiço",
+    "Gênero": "Fantasia",
+    "Autor": "Well",
+    "Editora": "Sal",
+    "Quantidade": "100",
+    "Numeração": "123"
+  }
+}
