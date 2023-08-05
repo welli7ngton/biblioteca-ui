@@ -6,5 +6,29 @@
     "Editora": "Sal",
     "Quantidade": "100",
     "Numeração": "123"
+  },
+  "345": {
+    "Título": "Matemática",
+    "Gênero": "Educação",
+    "Autor": "Well",
+    "Editora": "Well",
+    "Quantidade": "100",
+    "Numeração": "345"
+  },
+  "111": {
+    "Título": "Portugês",
+    "Gênero": "Educação",
+    "Autor": "Well",
+    "Editora": "Well",
+    "Quantidade": "100",
+    "Numeração": "111"
+  },
+  "98": {
+    "Título": "Inglês",
+    "Gênero": "Educação",
+    "Autor": "Well",
+    "Editora": "Well",
+    "Quantidade": "100",
+    "Numeração": "98"
   }
 }
