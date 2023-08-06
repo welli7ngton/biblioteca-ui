@@ -1,11 +1,11 @@
-from typing import Optional
+
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
-                               QMenu, QHBoxLayout, QPushButton)
+from PySide6.QtWidgets import (
+    QMainWindow, QApplication, QWidget, QGridLayout, QHBoxLayout, QPushButton
+    )
 import json
 import sys
-import os
-
+import qdarktheme
 
 FILE_PATH_STUDENTS = "att/jsonfiles/students.json"
 FILE_PATH_BOOKS = "att/jsonfiles/books.json"
@@ -120,9 +120,9 @@ class Library:
             return datas
 
     def dataExport(self, studentOrBook: Student | Book):
-        __filePath,__dict = (FILE_PATH_STUDENTS, self.studentsDatas)\
+        __filePath, __dict = (FILE_PATH_STUDENTS, self.studentsDatas)\
               if isinstance(studentOrBook, Student)\
-                else (FILE_PATH_BOOKS, self.booksDatas)
+              else (FILE_PATH_BOOKS, self.booksDatas)
 
         attributes = [
             attr for attr in dir(studentOrBook)
@@ -155,7 +155,7 @@ class Library:
 class MainWindow(QMainWindow):
     def __init__(self, ) -> None:
         super().__init__()
-        
+
         self.initUI()
         self.addWindowStyle()
 
@@ -174,54 +174,26 @@ class MainWindow(QMainWindow):
         # setando o layout da barra de navegação
         _navigationBarWidget.setLayout(_navigationBarLayout)
 
-        #setando o widget central na janela do programa
+        # setando o widget central na janela do programa
         self.setCentralWidget(_centralWidget)
 
         # adicionando a barra de navegação no layout principal do programa
         _mainLayout.addWidget(
-            _navigationBarWidget,
-            1,
-            1,
-            Qt.AlignmentFlag.AlignTop
+            _navigationBarWidget, 1, 1, Qt.AlignmentFlag.AlignTop
             )
 
-        _navigationBarLayout.addWidget(NavigationBarButtons("Cadastro"))
-        _navigationBarLayout.addWidget(NavigationBarButtons("Empréstimo"))
-        _navigationBarLayout.addWidget(NavigationBarButtons("Devolução"))
-
-
+        # TODO: Criar uma "aba" para cada parte da interface, pagina inicial,
+        # alunos, livros, empréstimos/devoluções.
 
     def addWindowStyle(self):
         self.setWindowTitle("Biblioteca")
         self.setMinimumSize(800, 800)
-        # self.setStyleSheet("background-color: #000")
-        
+        qdarktheme.setup_theme(theme="light", corner_shape="sharp")
 
-class NavigationBarButtons(QPushButton):
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-
-        qss = """
-            QpushButton: {
-            font-size: 80px
-            margin: 0px
-            padding: 0px
-            background-color: #000
-            }
-        """
-
-        self.setStyleSheet(qss)
-
-        # self.setStyleSheet("font-size: 50px")
-        # self.setStyleSheet("color: f00")
-        # self.setStyleSheet("border-radius: 20px")
-        
-        #TODO: estilizar barra de navegação.
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainWindow = MainWindow()
-
 
     mainWindow.show()
     sys.exit(app.exec())
