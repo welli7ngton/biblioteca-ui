@@ -1,4 +1,10 @@
+from typing import Optional
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QMainWindow, QApplication, QWidget, QGridLayout,
+                               QMenu, QHBoxLayout, QPushButton)
 import json
+import sys
+import os
 
 
 FILE_PATH_STUDENTS = "att/jsonfiles/students.json"
@@ -146,33 +152,76 @@ class Library:
                 )
 
 
+class MainWindow(QMainWindow):
+    def __init__(self, ) -> None:
+        super().__init__()
+        
+        self.initUI()
+        self.addWindowStyle()
+
+    def initUI(self):
+        # criando widget central e layout central
+        _centralWidget = QWidget()
+        _mainLayout = QGridLayout()
+
+        # criando widget da barra de navegação de páginas e layout
+        _navigationBarWidget = QWidget()
+        _navigationBarLayout = QHBoxLayout()
+
+        # setando o layout do widget central
+        _centralWidget.setLayout(_mainLayout)
+
+        # setando o layout da barra de navegação
+        _navigationBarWidget.setLayout(_navigationBarLayout)
+
+        #setando o widget central na janela do programa
+        self.setCentralWidget(_centralWidget)
+
+        # adicionando a barra de navegação no layout principal do programa
+        _mainLayout.addWidget(
+            _navigationBarWidget,
+            1,
+            1,
+            Qt.AlignmentFlag.AlignTop
+            )
+
+        _navigationBarLayout.addWidget(NavigationBarButtons("Cadastro"))
+        _navigationBarLayout.addWidget(NavigationBarButtons("Empréstimo"))
+        _navigationBarLayout.addWidget(NavigationBarButtons("Devolução"))
+
+
+
+    def addWindowStyle(self):
+        self.setWindowTitle("Biblioteca")
+        self.setMinimumSize(800, 800)
+        # self.setStyleSheet("background-color: #000")
+        
+
+class NavigationBarButtons(QPushButton):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        qss = """
+            QpushButton: {
+            font-size: 80px
+            margin: 0px
+            padding: 0px
+            background-color: #000
+            }
+        """
+
+        self.setStyleSheet(qss)
+
+        # self.setStyleSheet("font-size: 50px")
+        # self.setStyleSheet("color: f00")
+        # self.setStyleSheet("border-radius: 20px")
+        
+        #TODO: estilizar barra de navegação.
+
 if __name__ == "__main__":
-    s1 = Student()
-    s1.setName = "wellington almeida Silva"
-    s1.setAge = 20
-    s1.setAdress = "vila andrade, bairro açude velho casa n 1187"
-    s1.setContactNumber = "88 9 8176-2299"
-    s1.setShift = "matutino"
-    s1.setGradeYear = "8"
+    app = QApplication(sys.argv)
+    mainWindow = MainWindow()
 
-    b1 = Book()
-    b1.setTitle = "inglês intermediário"
-    b1.setAuthor = "escola"
-    b1.setGender = "educação"
-    b1.setPublishingCompany = "estado"
-    b1.setAmount = 200
-    print(s1._name)
-    print(s1._age)
-    print(s1._adress)
-    print(s1._contactNumber)
-    print(s1._shift)
-    print()
-    print(b1._title)
-    print(b1._gender)
-    print(b1._author)
-    print(b1._publishingCompany)
-    print(b1._amount)
 
-    l1 = Library()
-    l1.dataExport(b1)
-    l1.dataExport(s1)
+    mainWindow.show()
+    sys.exit(app.exec())
