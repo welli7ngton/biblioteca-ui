@@ -9,6 +9,6 @@ if __name__ == "__main__":
 
     for item, value in l1.booksDatas.items():
         print(item, value)
-    
+
     for item, value in l1.studentsDatas.items():
         print(item, value)
