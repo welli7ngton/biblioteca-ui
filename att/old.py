@@ -1,116 +1,84 @@
-# class Biblioteca:
+# classes para as janelas secundárias apenas com estilos
+class JanelaCadastraAluno(QDialog):
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
-#     def __init__(self) -> None:
+        self.setWindowTitle("Cadastro de Aluno")
+        self.setMinimumSize(900, 350)
+        self.layoutca = QFormLayout()
+        self.setLayout(self.layoutca)
+        self.campo_texto = [nome := QLineEdit(), idade := QSpinBox(),
+                            serie := QLineEdit(), turno := QLineEdit(),
+                            contato := QLineEdit(), endereco := QLineEdit()]
+        self.titulos = ["Nome Aluno", "Idade",
+                        "Série", "Turno", "Contato", "Endereço"]
+        for titulo, campo in enumerate(self.campo_texto):
+            self.layoutca.addRow(str(self.titulos[titulo]), campo)
 
-#         # Importando dados
-#         self.id_alunos = self.importacao(IDS_ALUNOS)
-#         self.info_alunos = self.importacao(INFO_ALUNOS)
-#         self.id_livros = self.importacao(IDS_LIVROS)
-#         self.info_livros = self.importacao(INFO_LIVROS)
-#         self.emprestimos = self.importacao(EMPRESTIMOS)
-#         self.id_emprestimo = self.importacao(ID_EMPRESTIMO)
+        self.botoes_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            )
 
-#     def importacao(self, caminho: str):
-#         with open(caminho, "r", encoding="utf-8") as arq:
-#             dados = json.load(arq)
-#         return dados
+        self.layoutca.addWidget(self.botoes_box)
+        self.botoes_box.accepted.connect(self.faz_slot(
+            biblioteca.cadastra_aluno,
+            nome, idade, serie,
+            turno, contato, endereco
+        ))
 
-#     def exportacao(self, caminho: str, dados: dict):
-#         with open(caminho, "w", encoding="utf-8") as arq:
-#             json.dump(dados, arq, ensure_ascii=False, indent=2)
+        self.botoes_box.rejected.connect(self.reject)
 
-#     def cadastra_aluno(
-#             self, nome: str, idade: str, serie: str,
-#             turno: str, contato: str, endereco: str):
+    def faz_slot(self, func, *args):
+        def slot():
+            n, i, s, t, c, e = args
+            if verifica_campos(*args):
+                msg = func(n.text(), i.text(), s.text(),
+                           t.text(), c.text(), e.text())
+                for b in args:
+                    b.clear()
+                faz_msg_box(
+                    "Cadastro realizado!", str(msg), False
+                        )
+        return slot
 
-#         _id = str(len(self.id_alunos))
-#         if _id in self.id_alunos:
-#             return False
-#         self.id_alunos.append(_id)
 
-#         self.info_alunos[_id] = {
-#             "ID": _id,
-#             "Nome": nome.title(),
-#             "Série": serie,
-#             "Turno": turno.title(),
-#             "Idade": idade,
-#             "Contato": contato,
-#             "Endereço": endereco.title()
-#             }
-#         self.exportacao(IDS_ALUNOS, self.id_alunos)
-#         self.exportacao(INFO_ALUNOS, self.info_alunos)
-#         return self.info_alunos[_id]
+class JanelaCadastroLivro(QDialog):
+    def __init__(self, biblioteca: Biblioteca, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
-#     def cadastra_livro(
-#             self, numeracao: str, titulo: str, genero: str,
-#             autor: str, editora: str, qtd: str
-#             ):
+        self.setWindowTitle("Cadastro de Livro")
+        self.setMinimumSize(900, 350)
+        layoutcl = QFormLayout()
+        self.setLayout(layoutcl)
+        layoutcl.addRow("Numeração:", numeracao := QSpinBox())
+        numeracao.setRange(0, 9999999)
+        layoutcl.addRow("Titulo Livro:", titulo := QLineEdit())
+        layoutcl.addRow("Genero:", genero := QLineEdit())
+        layoutcl.addRow("Autor:", autor := QLineEdit())
+        layoutcl.addRow("Editora:", editora := QLineEdit())
+        layoutcl.addRow("Quantidade:", qtd := QSpinBox())
+        qtd.setRange(0, 9999)
+        b_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        layoutcl.addWidget(b_box)
 
-#         self.info_livros[numeracao] = {
-#             "Título": titulo.capitalize(),
-#             "Gênero": genero.capitalize(),
-#             "Autor": autor.capitalize(),
-#             "Editora": editora.capitalize(),
-#             "Quantidade": qtd,
-#             "Numeração": numeracao
-#             }
-#         self.id_livros.append(numeracao)
+        b_box.accepted.connect(
+            self.faz_slot(
+                biblioteca.cadastra_livro,
+                numeracao, titulo, genero, autor, editora, qtd
+            )
+        )
+        b_box.rejected.connect(self.reject)
 
-#         self.exportacao(IDS_LIVROS, self.id_livros)
-#         self.exportacao(INFO_LIVROS, self.info_livros)
-#         return self.info_livros[numeracao]
-
-#     def altera_aluno(
-#             self, _id: str, nome: str, idade: str, serie: str,
-#             turno: str, contato: str, endereco: str
-#             ):
-
-#         if _id not in self.id_alunos:
-#             return None
-
-#         self.info_alunos[_id] = {
-#             "ID": _id,
-#             "Nome": nome.title(),
-#             "Série": serie,
-#             "Turno": turno.title(),
-#             "Idade": idade,
-#             "Contato": contato,
-#             "Endereço": endereco.title()
-#             }
-#         self.exportacao(INFO_ALUNOS, self.info_alunos)
-#         return self.info_alunos[_id]
-
-#     def altera_livro(self, numeracao: str, titulo: str, genero: str,
-#                      autor: str, editora: str, qtd: str
-#                      ):
-#         if numeracao not in self.id_livros:
-#             return None
-#         self.info_livros[numeracao] = (
-#             f"Título: {titulo.capitalize()}, "
-#             f"Gênero: {genero.capitalize()}, "
-#             f"Autor: {autor.capitalize()}, "
-#             f"Editora:  {editora.capitalize()}, Quantidade: {qtd}")
-#         self.exportacao(INFO_LIVROS, self.info_livros)
-#         return self.info_livros[numeracao]
-
-#     def fazer_emprestimo(self, _id: str, livro: str, devo: str):
-
-#         chave = str(datetime.now().microsecond)
-
-#         self.emprestimos[chave] = {
-#             "aluno": self.info_alunos[_id],
-#             "livro": livro.title(),
-#             "devolucao": devo
-#         }
-#         self.id_emprestimo[chave] = _id
-#         self.exportacao(EMPRESTIMOS, self.emprestimos)
-#         self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
-
-#         return chave, self.emprestimos[chave]
-
-#     def fazer_devolucao(self, chave: str):
-
-#         self.emprestimos.pop(chave)
-#         self.id_emprestimo.pop(chave)
-#         self.exportacao(EMPRESTIMOS, self.emprestimos)
-#         self.exportacao(ID_EMPRESTIMO, self.id_emprestimo)
+    def faz_slot(self, func, *args):
+        def slot():
+            n, t, g, a, e, q = args
+            if verifica_campos(*args):
+                msg = func(
+                    n.text(), t.text(), g.text(), a.text(), e.text(), q.text()
+                    )
+                for b in args:
+                    b.clear()
+                faz_msg_box(
+                    "Cadastro Realizado!", str(msg), False
+                    )
+        return slot

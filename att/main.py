@@ -1,7 +1,8 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QMainWindow, QApplication, QWidget, QGridLayout, QHBoxLayout, QPushButton
+    QMainWindow, QApplication, QWidget, QGridLayout, QHBoxLayout, QPushButton,
+    QDialog, QVBoxLayout,  QFormLayout,  QLineEdit
     )
 import json
 import sys
@@ -111,15 +112,15 @@ class Book:
 
 class Library:
     def __init__(self) -> None:
-        self.studentsDatas = self.dataImport(FILE_PATH_STUDENTS)
-        self.booksDatas = self.dataImport(FILE_PATH_BOOKS)
+        self.studentsDatas = self.__dataImport(FILE_PATH_STUDENTS)
+        self.booksDatas = self.__dataImport(FILE_PATH_BOOKS)
 
-    def dataImport(self, filePath: str):
+    def __dataImport(self, filePath: str):
         with open(filePath, "r", encoding="utf-8") as file:
             datas = json.load(file)
             return datas
 
-    def dataExport(self, studentOrBook: Student | Book):
+    def __dataExport(self, studentOrBook: Student | Book):
         __filePath, __dict = (FILE_PATH_STUDENTS, self.studentsDatas)\
               if isinstance(studentOrBook, Student)\
               else (FILE_PATH_BOOKS, self.booksDatas)
@@ -162,7 +163,7 @@ class MainWindow(QMainWindow):
     def initUI(self):
         # criando widget central e layout central
         _centralWidget = QWidget()
-        _mainLayout = QGridLayout()
+        _mainLayout = QVBoxLayout()
 
         # criando widget da barra de navegação de páginas e layout
         _navigationBarWidget = QWidget()
@@ -178,17 +179,62 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(_centralWidget)
 
         # adicionando a barra de navegação no layout principal do programa
-        _mainLayout.addWidget(
-            _navigationBarWidget, 1, 1, Qt.AlignmentFlag.AlignTop
-            )
+        _mainLayout.addWidget(_navigationBarWidget, alignment=Qt.AlignmentFlag.AlignTop)
 
-        # TODO: Criar uma "aba" para cada parte da interface, pagina inicial,
-        # alunos, livros, empréstimos/devoluções.
+        studentFunctions = QPushButton("Alunos")
+        bookFunctions = QPushButton("Livros")
+        loanOrDevolutionFunctions = QPushButton("Empréstimos | Devoluções")
+        reportsFunctions = QPushButton("Relatórios")
+
+        _navigationBarLayout.addWidget(studentFunctions)
+        _navigationBarLayout.addWidget(bookFunctions)
+        _navigationBarLayout.addWidget(loanOrDevolutionFunctions)
+        _navigationBarLayout.addWidget(reportsFunctions)
+
+        # test = makeWindow("Alunos")
+        # studentFunctions.clicked.connect(slot(test))
+
+        studentWIndowContent = self.makeStudentWindowContent()
+        bookWIndowContent = self.makeBookWindowContent()
+
+        studentFunctions.clicked.connect(slot(_mainLayout, studentWIndowContent))
+        bookFunctions.clicked.connect(slot(_mainLayout, bookWIndowContent))
 
     def addWindowStyle(self):
         self.setWindowTitle("Biblioteca")
-        self.setMinimumSize(800, 800)
+        self.resize(800, 800)
         qdarktheme.setup_theme(theme="light", corner_shape="sharp")
+
+    def makeStudentWindowContent(self):
+        _layout = QFormLayout()
+        _layout.addRow(name := QPushButton("Cadastra Aluno"))
+        _layout.addRow(age := QPushButton("Altera Cadastro"))
+        _layout.addRow(adress := QPushButton("Relatorio - Cadastros"))
+        _layout.addRow(contact := QPushButton("Pendências"))
+        return _layout
+
+    def makeBookWindowContent(self):
+        _layout = QFormLayout()
+        _layout.addRow(name := QLineEdit("Livro:"))
+        _layout.addRow(age := QLineEdit("Livro:"))
+        _layout.addRow(adress := QLineEdit("Livro:"))
+        _layout.addRow(contact := QLineEdit("Livro:"))
+        return _layout
+
+
+
+
+def slot(theMainLayout: QVBoxLayout, otherLayout: QFormLayout):
+    def addOtherLayout():
+        theMainLayout.addLayout(otherLayout, 1)
+    return addOtherLayout
+
+
+def makeWindow(windowTitle: str):
+    dialog = QDialog()
+    dialog.setWindowTitle(windowTitle)
+    dialog.resize(300, 300)
+    return dialog
 
 
 if __name__ == "__main__":
