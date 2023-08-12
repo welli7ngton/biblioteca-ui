@@ -1,100 +1,56 @@
-
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
-    QMainWindow, QApplication, QWidget, QHBoxLayout, QPushButton,
-    QDialog, QVBoxLayout, QFormLayout, QLineEdit
+    QMainWindow, QApplication, QWidget, QTabWidget,
+    QVBoxLayout, QGridLayout
     )
 import sys
-import qdarktheme
+
+# My imports
+# from mybuttons import MyButtons
+from studentlayout import StudentLayout
 
 
 class MainWindow(QMainWindow):
     def __init__(self, ) -> None:
         super().__init__()
-
-        self.initUI()
-        self.addWindowStyle()
-
-    def initUI(self):
-        # criando widget central e layout central
-        _centralWidget = QWidget()
-        _mainLayout = QVBoxLayout()
-
-        # criando widget da barra de navegação de páginas e layout
-        _navigationBarWidget = QWidget()
-        _navigationBarLayout = QHBoxLayout()
-
-        # setando o layout do widget central
-        _centralWidget.setLayout(_mainLayout)
-
-        # setando o layout da barra de navegação
-        _navigationBarWidget.setLayout(_navigationBarLayout)
-
-        # setando o widget central na janela do programa
-        self.setCentralWidget(_centralWidget)
-
-        # adicionando a barra de navegação no layout principal do programa
-        _mainLayout.addWidget(
-            _navigationBarWidget,
-            alignment=Qt.AlignmentFlag.AlignTop
-            )
-
-        studentFunctions = QPushButton("Alunos")
-        bookFunctions = QPushButton("Livros")
-        loanOrDevolutionFunctions = QPushButton("Empréstimos | Devoluções")
-        reportsFunctions = QPushButton("Relatórios")
-
-        _navigationBarLayout.addWidget(studentFunctions)
-        _navigationBarLayout.addWidget(bookFunctions)
-        _navigationBarLayout.addWidget(loanOrDevolutionFunctions)
-        _navigationBarLayout.addWidget(reportsFunctions)
-
-        # test = makeWindow("Alunos")
-        # studentFunctions.clicked.connect(slot(test))
-
-        studentWIndowContent = self.makeStudentWindowContent()
-        bookWIndowContent = self.makeBookWindowContent()
-
-        studentFunctions.clicked.connect(
-            slot(_mainLayout, studentWIndowContent)
-            )
-        bookFunctions.clicked.connect(
-            slot(_mainLayout, bookWIndowContent)
-            )
-
-    def addWindowStyle(self):
         self.setWindowTitle("Biblioteca")
         self.resize(800, 800)
-        qdarktheme.setup_theme(theme="light", corner_shape="sharp")
+        self.__initUI()
 
-    def makeStudentWindowContent(self):
-        _layout = QFormLayout()
-        _layout.addRow(QPushButton("Cadastra Aluno"))
-        _layout.addRow(QPushButton("Altera Cadastro"))
-        _layout.addRow(QPushButton("Relatorio - Cadastros"))
-        _layout.addRow(QPushButton("Pendências"))
-        return _layout
+    def __initUI(self):
+        _centralWidget = QWidget()
+        self.setCentralWidget(_centralWidget)
 
-    def makeBookWindowContent(self):
-        _layout = QFormLayout()
-        _layout.addRow(QLineEdit("Livro:"))
-        _layout.addRow(QLineEdit("Livro:"))
-        _layout.addRow(QLineEdit("Livro:"))
-        _layout.addRow(QLineEdit("Livro:"))
-        return _layout
+        _mainLayout = QVBoxLayout()
+        _centralWidget.setLayout(_mainLayout)
 
+        _tabWidget = QTabWidget()
+        _mainLayout.addWidget(_tabWidget)
 
-def slot(theMainLayout: QVBoxLayout, otherLayout: QFormLayout):
-    def addOtherLayout():
-        theMainLayout.addLayout(otherLayout, 1)
-    return addOtherLayout
+        initialTab = QWidget()
+        self.initialTabLayout = QGridLayout()
+        initialTab.setLayout(self.initialTabLayout)
 
+        studentTab = QWidget()
+        self.studentTabLayout = StudentLayout()
+        studentTab.setLayout(self.studentTabLayout)
 
-def makeWindow(windowTitle: str):
-    dialog = QDialog()
-    dialog.setWindowTitle(windowTitle)
-    dialog.resize(300, 300)
-    return dialog
+        bookTab = QWidget()
+        self.bookTabLayout = QGridLayout()
+        bookTab.setLayout(self.bookTabLayout)
+
+        loanAndDevolutionTab = QWidget()
+        self.loanAndDevolutionTabLayout = QGridLayout()
+        loanAndDevolutionTab.setLayout(self.loanAndDevolutionTabLayout)
+
+        reportsTab = QWidget()
+        reportsTabLayout = QGridLayout()
+        reportsTab.setLayout(reportsTabLayout)
+
+        _tabWidget.addTab(initialTab, "Início")
+        _tabWidget.addTab(studentTab, "Alunos")
+        _tabWidget.addTab(bookTab, "Livros")
+        _tabWidget.addTab(loanAndDevolutionTab, "Empréstimos e Devoluções")
+        _tabWidget.addTab(reportsTab, "Relatórios")
 
 
 if __name__ == "__main__":
