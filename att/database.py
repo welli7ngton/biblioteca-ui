@@ -2,6 +2,9 @@ import sqlite3
 from student import Student
 from book import Book
 from datetime import date, timedelta
+from utils import checkSpecialCharacters
+from utils import getAttributesValues
+
 
 DATABASE_FILE_PATH = './att/library.db'
 LOAN_PERIOD = 14
@@ -15,30 +18,34 @@ class DataBase():
         self.cursor = self.connection.cursor()
 
     def registerStudent(self, student: Student) -> None:
+        values = getAttributesValues(student)
 
-        self.cursor.execute(
-            "INSERT INTO students "
-            "(name, age, contact, adress, grade_year, shift) "
-            "VALUES("
-            f"'{student._name}', {student._age}, "
-            f"'{student._contactNumber}', '{student._adress}', "
-            f"'{student._gradeYear}', '{student._shift}'"
-            ")"
-        )
-        self.connection.commit()
+        if checkSpecialCharacters(values):
+            self.cursor.execute(
+                "INSERT INTO students "
+                "(name, age, contact, adress, grade_year, shift) "
+                "VALUES("
+                f"'{student._name}', {student._age}, "
+                f"'{student._contactNumber}', '{student._adress}', "
+                f"'{student._gradeYear}', '{student._shift}'"
+                ")"
+            )
+            self.connection.commit()
 
     def registerBook(self, book: Book) -> None:
 
-        self.cursor.execute(
-            "INSERT INTO books "
-            "(title, author, publishing_company, gender, amount) "
-            "VALUES("
-            f"'{book._title}', '{book._author}', "
-            f"'{book._publishingCompany}', '{book._gender}', "
-            f"{book._amount}"
-            ")"
-        )
-        self.connection.commit()
+        values = getAttributesValues(book)
+        if checkSpecialCharacters(values):
+            self.cursor.execute(
+                "INSERT INTO books "
+                "(title, author, publishing_company, gender, amount) "
+                "VALUES("
+                f"'{book._title}', '{book._author}', "
+                f"'{book._publishingCompany}', '{book._gender}', "
+                f"{book._amount}"
+                ")"
+            )
+            self.connection.commit()
 
     def registerLoan(self, student_id: int,
                      book_id: int, devolution_date=None) -> None:
@@ -73,23 +80,24 @@ class DataBase():
 
 
 if __name__ == "__main__":
-    # s1 = Student()
-    # s1.setName = "Qeijo"
-    # s1.setAdress = "vila acude distrito federal jaburu 12"
-    # s1.setAge = 12
-    # s1.setContactNumber = "1232148931238"
-    # s1.setGradeYear = "3"
-    # s1.setShift = "noturno"
+    s1 = Student()
+    s1.setName = "Qei;jo"
+    s1.setAdress = "vila acude distrito federal jaburu 12"
+    s1.setAge = 12
+    s1.setContactNumber = "1232148931238"
+    s1.setGradeYear = "3"
+    s1.setShift = "noturno"
 
-    # b1 = Book()
-    # b1.setTitle = "ingles"
-    # b1.setAmount = 200
-    # b1.setAuthor = "escola"
-    # b1.setGender = "educacao"
-    # b1.setPublishingCompany = "governo"
+    b1 = Book()
+    b1.setTitle = "ingles"
+    b1.setAmount = 200
+    b1.setAuthor = "escola"
+    b1.setGender = "educa-cao"
+    b1.setPublishingCompany = "governo"
 
     b = DataBase()
     # b.registerStudent(s1)
+    b.registerBook(b1)
 
-    b.registerLoan(99, 6, 5)
+    # b.registerLoan(99, 6, 5)
     b._closeCon()
