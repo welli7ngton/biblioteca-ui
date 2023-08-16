@@ -3,7 +3,6 @@
 
 def checkSpecialCharacters(strings_list: list[str]) -> bool:
     for i in strings_list:
-        print(i)
         for j in i:
             if j in ["'", ";", '"', "-"]:
                 raise Exception("Caracteres inválidos, possível SQL injection")
