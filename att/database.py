@@ -1,6 +1,7 @@
 import sqlite3
 from student import Student
-DATABASE_FILE_PATH = './att/database_content/librarytest.sqlite'
+from book import Book
+DATABASE_FILE_PATH = 'library.db'
 
 
 class DataBase():
@@ -8,64 +9,54 @@ class DataBase():
         self.connection = sqlite3.connect(DATABASE_FILE_PATH)
         self.cursor = self.connection.cursor()
 
-    def importData(self):
-        result = self.cursor.execute(
-            "SELECT * FROM students"
-        )
-
-        for data in result.fetchall():
-            print(data)
-
     def registerStudent(self, student: Student):
-        data = [
-            69,
-            student._name,
-            student._age,
-            student._contactNumber,
-            student._adress,
-            student._gradeYear,
-            student._shift,
-            "2023-08-15 14:57:16"
-        ]
 
-        self.cursor.executemany("""
-            INSERT INTO students VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-        """, data)
+        self.cursor.execute(
+            "INSERT INTO students "
+            "(name, age, contact, adress, grade_year, shift) "
+            "VALUES("
+            f"'{student._name}', {student._age}, "
+            f"'{student._contactNumber}', '{student._adress}', "
+            f"'{student._gradeYear}', '{student._shift}'"
+            ")"
+        )
         self.connection.commit()
-        print("Registro salvo!")
 
+    def registerBook(self, book: Book):
 
-def createDB():
-    con = sqlite3.connect(DATABASE_FILE_PATH)
-    cur = con.cursor()
+        self.cursor.execute(
+            "INSERT INTO books "
+            "(title, author, publishing_company, gender, amount) "
+            "VALUES("
+            f"'{book._title}', '{book._author}', "
+            f"'{book._publishingCompany}', '{book._gender}', "
+            f"{book._amount}"
+            ")"
+        )
+        self.connection.commit()
 
-    cur.execute(
-        'CREATE TABLE IF NOT EXISTS tabela_teste'
-        '('
-        'id_aluno INTEGER PRIMARY KEY AUTOINCREMENT, '
-        'nome TEXT, '
-        'idade INTEGER, '
-        'crated_at DATETIME DEFAULT(DATETIME("NOW"))'
-        ');'
-    )
-    con.commit()
-    cur.execute(
-        'INSERT INTO tabela_teste'
-        '(nome, idade) '
-        'VALUES '
-        '("JOSE", 20)'
-    )
-    cur.close()
-    con.close()
+    # TODO: registerLoan
+    # TODO: getStudent|BookID
 
 
 if __name__ == "__main__":
     s1 = Student()
-    s1.setName = "Pedro Henrique"
-    s1.setAdress = "Casa 32"
-    s1.setAge = "19"
-    s1.setContactNumber = "11 1111-1111"
-    s1.setGradeYear = "9"
-    s1.setShift = "Matutino"
+    s1.setName = "Qeijo"
+    s1.setAdress = "vila acude distrito federal jaburu 12"
+    s1.setAge = 12
+    s1.setContactNumber = "1232148931238"
+    s1.setGradeYear = "3"
+    s1.setShift = "noturno"
 
-    createDB()
+    b1 = Book()
+    b1.setTitle = "Harry Potter"
+    b1.setAmount = 100
+    b1.setAuthor = "Augusto ferreira"
+    b1.setGender = "fantasia"
+    b1.setPublishingCompany = "sei la"
+
+    b = DataBase()
+    b.registerStudent(s1)
+    b.registerBook(b1)
+    b.cursor.close()
+    b.connection.close()
