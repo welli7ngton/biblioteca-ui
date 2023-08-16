@@ -72,32 +72,29 @@ class DataBase():
         )
         self.connection.commit()
 
-    def _closeCon(self) -> None:
+    def deleteRegister(self, _id: int, table: str, column: str) -> None:
+        if checkSpecialCharacters(table) and\
+                checkSpecialCharacters(column) and\
+                self._checkIdexistence(_id, table, column):
+
+            self.cursor.execute(
+                f"DELETE FROM {table} WHERE {column}={_id}"
+            )
+            self.connection.commit()
+
+    def _checkIdexistence(self, _id: int, table: str, column) -> bool:
+
+        rows = self.cursor.execute(
+            f"SELECT * FROM {table} WHERE {column}"
+        )
+
+        for row in rows.fetchall():
+            if _id in row:
+                return True
+        raise Exception("ID NÃO EXISTE")
+
+    def _closeConnectionAndCursor(self) -> None:
         self.cursor.close()
         self.connection.close()
 
     # TODO: getStudent|BookID
-
-
-if __name__ == "__main__":
-    s1 = Student()
-    s1.setName = "Qei;jo"
-    s1.setAdress = "vila acude distrito federal jaburu 12"
-    s1.setAge = 12
-    s1.setContactNumber = "1232148931238"
-    s1.setGradeYear = "3"
-    s1.setShift = "noturno"
-
-    b1 = Book()
-    b1.setTitle = "ingles"
-    b1.setAmount = 200
-    b1.setAuthor = "escola"
-    b1.setGender = "educa-cao"
-    b1.setPublishingCompany = "governo"
-
-    b = DataBase()
-    # b.registerStudent(s1)
-    b.registerBook(b1)
-
-    # b.registerLoan(99, 6, 5)
-    b._closeCon()
