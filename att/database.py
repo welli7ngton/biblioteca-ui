@@ -1,6 +1,6 @@
 import sqlite3
-from student import Student
-from book import Book
+from att.student_and_book import Student
+from att.student_and_book import Book
 from datetime import date, timedelta
 from utils import checkSpecialCharacters
 from utils import getAttributesValues
