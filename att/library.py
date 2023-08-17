@@ -1,5 +1,5 @@
-from student import Student
-from book import Book
+from att.student_and_book import Student
+from att.student_and_book import Book
 import json
 
 FILE_PATH_STUDENTS = "att/jsonfiles/students.json"
