@@ -6,7 +6,7 @@ import sys
 
 # My imports
 # from mybuttons import MyButtons
-from studentlayout import StudentLayout
+from tab_layouts import StudentLayout
 
 
 class MainWindow(QMainWindow):
