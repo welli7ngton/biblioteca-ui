@@ -1,5 +1,5 @@
-from att.student_and_book import Student
-from att.student_and_book import Book
+from student_and_book import Student
+from student_and_book import Book
 import json
 
 FILE_PATH_STUDENTS = "att/jsonfiles/students.json"
@@ -26,19 +26,19 @@ class Library:
             attr for attr in dir(studentOrBook)
             if not attr.startswith("__")
             and not attr.startswith("set")
-            ]
+        ]
 
         dictionaryKeyAttributes = [
             attr.replace("set", "") for attr in dir(studentOrBook)
             if attr.startswith("set")
-            ]
+        ]
 
         objectData = dict()
         for i in range(len(attributes)):
             objectData[dictionaryKeyAttributes[i]] = getattr(
                 studentOrBook,
                 attributes[i]
-                )
+            )
 
         __dict[len(__dict)] = objectData
         with open(__filePath, "w", encoding="utf-8") as file:
@@ -47,4 +47,4 @@ class Library:
                 file,
                 ensure_ascii=False,
                 indent=2
-                )
+            )

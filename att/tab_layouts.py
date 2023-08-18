@@ -15,16 +15,16 @@ class StudentLayout(QVBoxLayout):
         self.addWidget(
             register,
             alignment=Qt.AlignmentFlag.AlignCenter
-            )
+        )
         self.addWidget(
             changeRegister,
             alignment=Qt.AlignmentFlag.AlignCenter
-            )
+        )
         self.addWidget(
             makeRegisteredReport,
             alignment=Qt.AlignmentFlag.AlignCenter
-            )
+        )
         self.addWidget(
             deleteRegister,
             alignment=Qt.AlignmentFlag.AlignCenter
-            )
+        )

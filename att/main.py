@@ -1,5 +1,5 @@
-from att.student_and_book import Student
-from att.student_and_book import Book
+from student_and_book import Student
+from student_and_book import Book
 from library import Library
 
 if __name__ == "__main__":

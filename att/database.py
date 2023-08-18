@@ -1,6 +1,6 @@
 import sqlite3
-from att.student_and_book import Student
-from att.student_and_book import Book
+from student_and_book import Student
+from student_and_book import Book
 from datetime import date, timedelta
 from utils import checkSpecialCharacters
 from utils import getAttributesValues
@@ -93,8 +93,20 @@ class DataBase():
                 return True
         raise Exception("ID NÃO EXISTE")
 
+    def getTableInfo(self, table: str) -> None:
+        tableRows = self.cursor.execute(
+            f"SELECT * FROM {table}"
+        )
+
+        for row in tableRows.fetchall():
+            print(row)
+
     def _closeConnectionAndCursor(self) -> None:
         self.cursor.close()
         self.connection.close()
 
-    # TODO: getStudent|BookID
+
+if __name__ == "__main__":
+    b = DataBase()
+    b.getTableInfo("students")
+    b._closeConnectionAndCursor()
