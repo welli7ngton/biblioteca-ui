@@ -1,14 +1,17 @@
 from student_and_book import Student
 from student_and_book import Book
-from library import Library
+from database import DataBase
+from PySide6.QtWidgets import QApplication
+from ui import MainWindow
+import sys
 
 if __name__ == "__main__":
-    l1 = Library()
     s1 = Student()
     b1 = Book()
+    db = DataBase()
 
-    for item, value in l1.booksDatas.items():
-        print(item, value)
+    app = QApplication(sys.argv)
 
-    for item, value in l1.studentsDatas.items():
-        print(item, value)
+    mainWindow = MainWindow()
+    mainWindow.show()
+    sys.exit(app.exec())
