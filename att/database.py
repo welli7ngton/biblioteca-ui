@@ -18,19 +18,17 @@ class DataBase():
         self.cursor = self.connection.cursor()
 
     def registerStudent(self, student: Student) -> None:
-        values = getAttributesValues(student)
 
-        if checkSpecialCharacters(values):
-            self.cursor.execute(
-                "INSERT INTO students "
-                "(name, age, contact, adress, grade_year, shift) "
-                "VALUES("
-                f"'{student._name}', {student._age}, "
-                f"'{student._contactNumber}', '{student._adress}', "
-                f"'{student._gradeYear}', '{student._shift}'"
-                ")"
-            )
-            self.connection.commit()
+        self.cursor.execute(
+            "INSERT INTO students "
+            "(name, age, contact, adress, grade_year, shift) "
+            "VALUES(?, ?, ?, ?, ?, ?)",
+            [
+                student._name, student._age, student._contactNumber,
+                student._adress, student._gradeYear, student._shift
+            ]
+        )
+        self.connection.commit()
 
     def registerBook(self, book: Book) -> None:
 
@@ -39,25 +37,28 @@ class DataBase():
             self.cursor.execute(
                 "INSERT INTO books "
                 "(title, author, publishing_company, gender, amount) "
-                "VALUES("
-                f"'{book._title}', '{book._author}', "
-                f"'{book._publishingCompany}', '{book._gender}', "
-                f"{book._amount}"
-                ")"
+                "VALUES(?, ?, ?, ?, ?, )",
+                [
+                    book._title, book._author, book._publishingCompany,
+                    book._gender, book._amount
+                ]
             )
             self.connection.commit()
 
-    def registerLoan(self, student_id: int,
-                     book_id: int, devolution_date=None) -> None:
+    def registerLoan(
+        self, student_id: int,
+        book_id: int, devolution_date=None
+    ) -> None:
 
         if devolution_date:
             self.cursor.execute(
                 "INSERT INTO loan "
                 "(student_id, book_id, loan_date, devolution_date) "
-                "VALUES("
-                f"'{student_id}', '{book_id}', "
-                f"'{TODAY}', '{TODAY + timedelta(days=devolution_date)}' "
-                ")"
+                "VALUES(?, ?, ?, ?)",
+                [
+                    student_id, book_id, TODAY,
+                    (TODAY + timedelta(days=devolution_date))
+                ]
             )
             self.connection.commit()
             return
@@ -65,10 +66,10 @@ class DataBase():
         self.cursor.execute(
             "INSERT INTO loan "
             "(student_id, book_id, loan_date, devolution_date) "
-            "VALUES("
-            f"'{student_id}', '{book_id}', "
-            f"'{TODAY}', '{DEVOLUTION_DATE}' "
-            ")"
+            "VALUES(?, ?, ?, ?)",
+            [
+                student_id, book_id, TODAY, DEVOLUTION_DATE
+            ]
         )
         self.connection.commit()
 
@@ -93,9 +94,9 @@ class DataBase():
                 return True
         raise Exception("ID NÃO EXISTE")
 
-    def getTableInfo(self, table: str) -> None:
+    def getTableInfo(self, table_name: str) -> None:
         tableRows = self.cursor.execute(
-            f"SELECT * FROM {table}"
+            f"SELECT * FROM {table_name}"
         )
 
         for row in tableRows.fetchall():
@@ -104,9 +105,3 @@ class DataBase():
     def _closeConnectionAndCursor(self) -> None:
         self.cursor.close()
         self.connection.close()
-
-
-if __name__ == "__main__":
-    b = DataBase()
-    b.getTableInfo("students")
-    b._closeConnectionAndCursor()
