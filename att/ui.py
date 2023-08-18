@@ -2,11 +2,8 @@ from PySide6.QtWidgets import (
     QMainWindow, QApplication, QWidget, QTabWidget,
     QVBoxLayout, QGridLayout
     )
-import sys
-
-# My imports
-# from mybuttons import MyButtons
 from tab_layouts import StudentLayout
+import sys
 
 
 class MainWindow(QMainWindow):
@@ -23,24 +20,25 @@ class MainWindow(QMainWindow):
         _mainLayout = QVBoxLayout()
         _centralWidget.setLayout(_mainLayout)
 
-        _tabWidget = QTabWidget()
-        _mainLayout.addWidget(_tabWidget)
+        _mainLayout.addWidget(self.createTabWidget())
 
+    def createTabWidget(self):
+        _tabWidget = QTabWidget()
         initialTab = QWidget()
-        self.initialTabLayout = QGridLayout()
-        initialTab.setLayout(self.initialTabLayout)
+        initialTabLayout = QGridLayout()
+        initialTab.setLayout(initialTabLayout)
 
         studentTab = QWidget()
-        self.studentTabLayout = StudentLayout()
-        studentTab.setLayout(self.studentTabLayout)
+        studentTabLayout = StudentLayout()
+        studentTab.setLayout(studentTabLayout)
 
         bookTab = QWidget()
-        self.bookTabLayout = QGridLayout()
-        bookTab.setLayout(self.bookTabLayout)
+        bookTabLayout = QGridLayout()
+        bookTab.setLayout(bookTabLayout)
 
         loanAndDevolutionTab = QWidget()
-        self.loanAndDevolutionTabLayout = QGridLayout()
-        loanAndDevolutionTab.setLayout(self.loanAndDevolutionTabLayout)
+        loanAndDevolutionTabLayout = QGridLayout()
+        loanAndDevolutionTab.setLayout(loanAndDevolutionTabLayout)
 
         reportsTab = QWidget()
         reportsTabLayout = QGridLayout()
@@ -51,6 +49,7 @@ class MainWindow(QMainWindow):
         _tabWidget.addTab(bookTab, "Livros")
         _tabWidget.addTab(loanAndDevolutionTab, "Empréstimos e Devoluções")
         _tabWidget.addTab(reportsTab, "Relatórios")
+        return _tabWidget
 
 
 if __name__ == "__main__":
