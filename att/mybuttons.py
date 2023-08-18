@@ -9,4 +9,4 @@ class MyButtons(QPushButton):
         font.setPixelSize(40)
         font.setBold(True)
         self.setFont(font)
-        self.setFixedSize(450, 125)
+        self.setFixedSize(500, 100)

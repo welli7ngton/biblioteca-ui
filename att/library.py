@@ -17,7 +17,7 @@ class Library:
             datas = json.load(file)
             return datas
 
-    def __dataExport(self, studentOrBook: Student | Book):
+    def __dataExport(self, studentOrBook: Student | Book) -> None:
         __filePath, __dict = (FILE_PATH_STUDENTS, self.studentsDatas)\
               if isinstance(studentOrBook, Student)\
               else (FILE_PATH_BOOKS, self.booksDatas)
