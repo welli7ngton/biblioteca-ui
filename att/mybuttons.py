@@ -6,7 +6,6 @@ class MyButtons(QPushButton):
         super().__init__(*args, **kwargs)
 
         font = self.font()
-        font.setPixelSize(40)
-        font.setBold(True)
+        font.setPixelSize(30)
         self.setFont(font)
-        self.setFixedSize(500, 100)
+        self.setFixedHeight(100)
