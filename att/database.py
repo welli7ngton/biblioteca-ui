@@ -1,9 +1,7 @@
-import sqlite3
 from student_and_book import Student
 from student_and_book import Book
 from datetime import date, timedelta
-from utils import checkSpecialCharacters
-from utils import getAttributesValues
+import sqlite3
 
 
 DATABASE_FILE_PATH = './att/library.db'
@@ -32,18 +30,16 @@ class DataBase():
 
     def registerBook(self, book: Book) -> None:
 
-        values = getAttributesValues(book)
-        if checkSpecialCharacters(values):
-            self.cursor.execute(
-                "INSERT INTO books "
-                "(title, author, publishing_company, gender, amount) "
-                "VALUES(?, ?, ?, ?, ?, )",
-                [
-                    book._title, book._author, book._publishingCompany,
-                    book._gender, book._amount
-                ]
-            )
-            self.connection.commit()
+        self.cursor.execute(
+            "INSERT INTO books "
+            "(title, author, publishing_company, gender, amount) "
+            "VALUES(?, ?, ?, ?, ?)",
+            [
+                book._title, book._author, book._publishingCompany,
+                book._gender, book._amount
+            ]
+        )
+        self.connection.commit()
 
     def registerLoan(
         self, student_id: int,
@@ -74,10 +70,7 @@ class DataBase():
         self.connection.commit()
 
     def deleteRegister(self, _id: int, table: str, column: str) -> None:
-        if checkSpecialCharacters(table) and\
-                checkSpecialCharacters(column) and\
-                self._checkIdexistence(_id, table, column):
-
+        if self._checkIdexistence(_id, table, column):
             self.cursor.execute(
                 f"DELETE FROM {table} WHERE {column}={_id}"
             )
@@ -94,13 +87,12 @@ class DataBase():
                 return True
         raise Exception("ID NÃO EXISTE")
 
-    def getTableInfo(self, table_name: str) -> None:
+    def _getTableInfo(self, table_name: str) -> list[tuple]:
         tableRows = self.cursor.execute(
             f"SELECT * FROM {table_name}"
         )
 
-        for row in tableRows.fetchall():
-            print(row)
+        return tableRows.fetchall()
 
     def _closeConnectionAndCursor(self) -> None:
         self.cursor.close()
