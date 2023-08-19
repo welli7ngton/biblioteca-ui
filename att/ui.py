@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QMainWindow, QApplication, QWidget, QTabWidget,
-    QVBoxLayout, QGridLayout
+    QGridLayout
     )
 from tab_layouts import StudentLayout
 from tab_layouts import BookLayout
@@ -9,20 +9,11 @@ import sys
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, ) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle("Biblioteca")
-        self.resize(800, 800)
-        self.__initUI()
-
-    def __initUI(self) -> None:
-        _centralWidget = QWidget()
-        self.setCentralWidget(_centralWidget)
-
-        _mainLayout = QVBoxLayout()
-        _centralWidget.setLayout(_mainLayout)
-
-        _mainLayout.addWidget(self.createTabWidget())
+        self.resize(900, 800)
+        self.setCentralWidget(self.createTabWidget())
 
     def createTabWidget(self) -> QTabWidget:
         _tabWidget = QTabWidget()
