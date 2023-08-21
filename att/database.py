@@ -28,12 +28,38 @@ class DataBase():
         )
         self.connection.commit()
 
+    def changeRegisterStudent(self, _id: int, student: Student) -> None:
+        self.cursor.execute(
+            f"UPDATE students SET "
+            "name = ?, age = ?, contact = ?, "
+            "adress = ?, grade_year = ?, shift = ? "
+            f"WHERE student_id = {_id}",
+            [
+                student._name, student._age, student._contactNumber,
+                student._adress, student._gradeYear, student._shift
+            ]
+        )
+        self.connection.commit()
+
     def registerBook(self, book: Book) -> None:
 
         self.cursor.execute(
             "INSERT INTO books "
             "(title, author, publishing_company, gender, amount) "
             "VALUES(?, ?, ?, ?, ?)",
+            [
+                book._title, book._author, book._publishingCompany,
+                book._gender, book._amount
+            ]
+        )
+        self.connection.commit()
+
+    def changeRegisterBook(self, _id: int, book: Book) -> None:
+        self.cursor.execute(
+            f"UPDATE books SET "
+            "title = ?, author = ?, publishing_company = ?, "
+            "gender = ?, amount = ? "
+            f"WHERE book_id = {_id}",
             [
                 book._title, book._author, book._publishingCompany,
                 book._gender, book._amount
