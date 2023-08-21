@@ -1,13 +1,7 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QTabWidget, QGridLayout
-    )
-# from tab_layouts import StudentLayout
-# from tab_layouts import BookLayout
-# from tab_layouts import loanAndDevolutionLayout
-
-from PySide6.QtWidgets import (
+    QMainWindow, QWidget, QTabWidget, QGridLayout,
     QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
-)
+    )
 from function_windows import StudentRegisterWindow
 from function_windows import BookRegisterWindow
 from mybuttons import MyButtons
@@ -21,7 +15,7 @@ LOAN_INFO = db._getTableInfo("loan")
 db._closeConnectionAndCursor()
 
 
-def createTable(headerLabels: list[str], infos) -> QTableWidget:
+def createTable(headerLabels: list[str], infos: list[tuple]) -> QTableWidget:
     table = QTableWidget()
     table.setColumnCount(len(headerLabels))
     table.setHorizontalHeaderLabels(headerLabels)
