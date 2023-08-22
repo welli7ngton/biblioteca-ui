@@ -37,6 +37,10 @@ class BaseRegisterWindow(QDialog):
             self.buttonBox.accepted.connect(self.getNewBookInfos)
         elif windowName == "Altera Cadastro - Livro":
             self.buttonBox.accepted.connect(self.getChangesBook)
+        elif windowName == "Apagar Cadastro - Aluno":
+            self.buttonBox.accepted.connect(self.deleteStudentRegister)
+        elif windowName == "Apagar Cadastro - Livro":
+            self.buttonBox.accepted.connect(self.deleteBookRegister)
 
         self.buttonBox.rejected.connect(self.reject)
 
@@ -106,6 +110,43 @@ class BaseRegisterWindow(QDialog):
         self._makeMessageBox("Cadastro Atualizado!", attributes[1:])
         self.db._closeConnectionAndCursor()
 
+    def deleteStudentRegister(self):
+        for field in self.fields.values():
+            _id = field.text()
+        try:
+            self.db.deleteRegister(int(_id), "students", "student_id")
+        except Exception as e:
+            if "ID NÃO EXISTE" in str(e):
+                self._makeMessageBox(
+                    "Cadastro Não Encontrado!",
+                    "O ID informado aparenta não existir, "
+                    "revise o ID e tente novamente."
+                )
+                return
+        self._makeMessageBox(
+            "Cadastro Apagado!",
+            "Registros do Aluno foram apagados do sistema."
+        )
+
+    def deleteBookRegister(self):
+        for field in self.fields.values():
+            _id = field.text()
+
+        try:
+            self.db.deleteRegister(int(_id), "books", "book_id")
+        except Exception as e:
+            if "ID NÃO EXISTE" in str(e):
+                self._makeMessageBox(
+                    "Cadastro Não Encontrado!",
+                    "O ID informado aparenta não existir, "
+                    "revise o ID e tente novamente."
+                )
+                return
+        self._makeMessageBox(
+            "Cadastro Apagado!",
+            "Registros do Livro foram apagados do sistema."
+        )
+
     def _makeMessageBox(self, _title: str, _content: list):
         messageBox = QMessageBox()
         messageBox.setWindowTitle(_title)
@@ -161,3 +202,8 @@ class BookRegisterWindow(BaseRegisterWindow):
                 ("Quantidade", QSpinBox),
             ]
         super().__init__("Cadastro de Livro", fields)
+
+
+class DeleteRegisterWindow(BaseRegisterWindow):
+    def __init__(self, _type: str) -> None:
+        super().__init__("Apagar Cadastro" + " - " + _type, [("ID", QSpinBox)])
