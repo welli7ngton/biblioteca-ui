@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     )
 from function_windows import StudentRegisterWindow
 from function_windows import BookRegisterWindow
+from function_windows import DeleteRegisterWindow
 from mybuttons import MyButtons
 from database import DataBase
 
@@ -74,6 +75,7 @@ class StudentLayout(QVBoxLayout):
 
         self.registerWindow = StudentRegisterWindow()
         self.changeRegisterWindow = StudentRegisterWindow(changeRegister=True)
+        self.deleteRefisterWindow = DeleteRegisterWindow("Aluno")
 
         register = MyButtons("Cadastro")
         changeRegister = MyButtons("Alterar Cadastro")
@@ -99,6 +101,7 @@ class StudentLayout(QVBoxLayout):
 
         register.clicked.connect(self.registerWindow.show)
         changeRegister.clicked.connect(self.changeRegisterWindow.show)
+        deleteRegister.clicked.connect(self.deleteRefisterWindow.show)
 
 
 class BookLayout(QVBoxLayout):
@@ -107,6 +110,7 @@ class BookLayout(QVBoxLayout):
 
         self.registerWindow = BookRegisterWindow()
         self.changeRegisterWindow = BookRegisterWindow(changeRegister=True)
+        self.deleteRegisterwindow = DeleteRegisterWindow("Livro")
         self.bookTable = createTable(
             [
                 "ID",
@@ -130,6 +134,7 @@ class BookLayout(QVBoxLayout):
 
         register.clicked.connect(self.registerWindow.show)
         changeRegister.clicked.connect(self.changeRegisterWindow.show)
+        deleteRegister.clicked.connect(self.deleteRegisterwindow.show)
 
 
 class loanAndDevolutionLayout(QVBoxLayout):
