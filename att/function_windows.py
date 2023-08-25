@@ -6,13 +6,16 @@ from student_and_book import (
 )
 from database import DataBase
 
+STUDENT = Student()
+BOOK = Book()
+DATABASE = DataBase()
+
 
 class BaseRegisterWindow(QDialog):
     def __init__(self, windowName: str, fields: list[tuple]) -> None:
         super().__init__()
         self.setWindowTitle(windowName)
         self.setFixedSize(600, 400)
-        self.db = DataBase()
         _layout = QFormLayout()
         self.setLayout(_layout)
         self.fields = {}
@@ -46,34 +49,31 @@ class BaseRegisterWindow(QDialog):
 
     def getNewStundetInfos(self):
         attributes = []
-        _student = Student()
         for field in self.fields.values():
             attributes.append(field.text())
             field.clear()
 
-        _student.setName = attributes[0]
-        _student.setAge = int(attributes[1])
-        _student.setAdress = attributes[2]
-        _student.setContactNumber = attributes[3]
-        _student.setShift = attributes[4]
-        _student.setGradeYear = attributes[5]
-        self.db.registerStudent(_student)
+        STUDENT.setName = attributes[0]
+        STUDENT.setAge = int(attributes[1])
+        STUDENT.setAdress = attributes[2]
+        STUDENT.setContactNumber = attributes[3]
+        STUDENT.setShift = attributes[4]
+        STUDENT.setGradeYear = attributes[5]
+        DATABASE.registerStudent(STUDENT)
         self._makeMessageBox("Cadastro Realizado!", attributes)
-        self.db._closeConnectionAndCursor()
 
     def getNewBookInfos(self):
         attributes = []
         for field in self.fields.values():
             attributes.append(field.text())
             field.clear()
-        _book = Book()
-        _book.setTitle = attributes[0]
-        _book.setAuthor = attributes[1]
-        _book.setPublishingCompany = attributes[2]
-        _book.setGender = attributes[3]
-        _book.setAmount = int(attributes[4])
-        self.db.registerBook(_book)
-        self.db._closeConnectionAndCursor()
+
+        BOOK.setTitle = attributes[0]
+        BOOK.setAuthor = attributes[1]
+        BOOK.setPublishingCompany = attributes[2]
+        BOOK.setGender = attributes[3]
+        BOOK.setAmount = int(attributes[4])
+        DATABASE.registerBook(BOOK)
         self._makeMessageBox("Cadastro Realizado!", attributes)
 
     def getChangesStudent(self):
@@ -90,9 +90,8 @@ class BaseRegisterWindow(QDialog):
         _student.setContactNumber = attributes[4]
         _student.setShift = attributes[5]
         _student.setGradeYear = attributes[6]
-        self.db.changeRegisterStudent(_id, _student)
+        DATABASE.changeRegisterStudent(_id, _student)
         self._makeMessageBox("Cadastro Atualizado!", attributes[1:])
-        self.db._closeConnectionAndCursor()
 
     def getChangesBook(self):
         attributes = []
@@ -106,15 +105,14 @@ class BaseRegisterWindow(QDialog):
         _book.setPublishingCompany = attributes[3]
         _book.setGender = attributes[4]
         _book.setAmount = int(attributes[5])
-        self.db.changeRegisterBook(_id, _book)
+        DATABASE.changeRegisterBook(_id, _book)
         self._makeMessageBox("Cadastro Atualizado!", attributes[1:])
-        self.db._closeConnectionAndCursor()
 
     def deleteStudentRegister(self):
         for field in self.fields.values():
             _id = field.text()
         try:
-            self.db.deleteRegister(int(_id), "students", "student_id")
+            DATABASE.deleteRegister(int(_id), "students", "student_id")
         except Exception as e:
             if "ID NÃO EXISTE" in str(e):
                 self._makeMessageBox(
@@ -133,7 +131,7 @@ class BaseRegisterWindow(QDialog):
             _id = field.text()
 
         try:
-            self.db.deleteRegister(int(_id), "books", "book_id")
+            DATABASE.deleteRegister(int(_id), "books", "book_id")
         except Exception as e:
             if "ID NÃO EXISTE" in str(e):
                 self._makeMessageBox(
