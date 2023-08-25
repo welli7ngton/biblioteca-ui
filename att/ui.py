@@ -7,6 +7,8 @@ from function_windows import BookRegisterWindow
 from function_windows import DeleteRegisterWindow
 from mybuttons import MyButtons
 from database import DataBase
+import qdarktheme
+import json
 
 
 db = DataBase()
@@ -14,6 +16,21 @@ STUDENTS_INFO = db._getTableInfo("students")
 BOOKS_INFO = db._getTableInfo("books")
 LOAN_INFO = db._getTableInfo("loan")
 db._closeConnectionAndCursor()
+
+with open("./att/theme_config/theme.json", "r") as file:
+    THEME = json.load(file)
+
+
+def changeTheme(func, theme: str):
+    def slot():
+        func(theme)
+        with open(
+            "./att/theme_config/theme.json",
+            "w",
+            encoding="utf-8"
+        ) as file:
+            json.dump(theme, file, ensure_ascii=False, indent=2)
+    return slot
 
 
 def createTable(headerLabels: list[str], infos: list[tuple]) -> QTableWidget:
@@ -43,11 +60,12 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Biblioteca")
         self.resize(900, 800)
         self.setCentralWidget(self.createTabWidget())
+        qdarktheme.setup_theme(THEME)
 
     def createTabWidget(self) -> QTabWidget:
         _tabWidget = QTabWidget()
         initialTab = QWidget()
-        initialTabLayout = QGridLayout()
+        initialTabLayout = InitialLayout()
         initialTab.setLayout(initialTabLayout)
 
         studentTab = QWidget()
@@ -158,3 +176,18 @@ class loanAndDevolutionLayout(QVBoxLayout):
 
         self.addWidget(loan)
         self.addWidget(devolution)
+
+
+class InitialLayout(QGridLayout):
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+        b1 = MyButtons("Escuro")
+        b2 = MyButtons("Claro")
+
+        self.addWidget(b1, 1, 1)
+        self.addWidget(b2, 1, 2)
+
+        b1.clicked.connect(changeTheme(qdarktheme.setup_theme, "dark"))
+        b2.clicked.connect(changeTheme(qdarktheme.setup_theme, "light"))
