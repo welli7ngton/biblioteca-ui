@@ -4,7 +4,7 @@ from datetime import date, timedelta
 import sqlite3
 
 
-DATABASE_FILE_PATH = './att/library.db'
+DATABASE_FILE_PATH = './att/_library.db'
 LOAN_PERIOD = 14
 TODAY = date.today()
 DEVOLUTION_DATE = TODAY + timedelta(days=LOAN_PERIOD)
