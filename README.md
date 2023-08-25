@@ -1,7 +1,7 @@
 # Sistema de Gerenciamento de Biblioteca com Interface Gráfica
 
 ## notas /att
-Será necessário um arquivo .db como de base de dados para que a nova interface funcione, estou usando a nomecltura '_library.db' e ignorando para evitar commits sem conteúdo para agregar.
+Será necessário um arquivo .db como de base de dados para que a nova interface funcione, estou usando a nomeclatura '_library.db' e ignorando para evitar commits sem conteúdo para agregar.
 
 ## Descrição
 
