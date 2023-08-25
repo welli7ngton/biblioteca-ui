@@ -1,4 +1,8 @@
 # Sistema de Gerenciamento de Biblioteca com Interface Gráfica
+
+## notas /att
+Será necessário um arquivo .db como de base de dados para que a nova interface funcione, estou usando a nomecltura '_library.db' e ignorando para evitar commits sem conteúdo para agregar.
+
 ## Descrição
 
 O Sistema de Gerenciamento de Biblioteca é uma aplicação desenvolvida 100% em Python com interface gráfica usando PySide6 e pyqtdarktheme. O objetivo é proporcionar uma ferramenta simples e eficiente para o gerenciamento do acervo de uma biblioteca em uma escola pública. A aplicação permite o cadastro e a alteração de informações de livros e alunos, além de possibilitar o registro de empréstimos e devoluções de livros.
