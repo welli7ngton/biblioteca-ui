@@ -25,7 +25,7 @@ def changeTheme(func, theme: str):
     def slot():
         func(theme)
         with open(
-            "./att/theme_config/theme.json",
+            "./att/theme_configs/theme.json",
             "w",
             encoding="utf-8"
         ) as file:
