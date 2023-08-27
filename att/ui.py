@@ -17,7 +17,7 @@ BOOKS_INFO = db._getTableInfo("books")
 LOAN_INFO = db._getTableInfo("loan")
 db._closeConnectionAndCursor()
 
-with open("./att/theme_config/theme.json", "r") as file:
+with open("./att/theme_configs/theme.json", "r") as file:
     THEME = json.load(file)
 
 
