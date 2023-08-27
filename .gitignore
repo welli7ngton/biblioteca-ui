@@ -6,6 +6,7 @@ _library.db
 .env
 ./att/jsonfiles
 db_files
+theme_configs
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
