@@ -1,10 +1,13 @@
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QTabWidget, QGridLayout,
     QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
-    )
-from function_windows import StudentRegisterWindow
-from function_windows import BookRegisterWindow
-from function_windows import DeleteRegisterWindow
+)
+from function_windows import (
+    StudentRegisterWindow,
+    BookRegisterWindow,
+    DeleteRegisterWindow,
+    LoanANdDevolutionWindow
+)
 from mybuttons import MyButtons
 from database import DataBase
 import qdarktheme
@@ -98,9 +101,7 @@ class StudentLayout(QVBoxLayout):
         register = MyButtons("Cadastro")
         changeRegister = MyButtons("Alterar Cadastro")
         deleteRegister = MyButtons("Apagar Cadastro")
-
-        self.studentTable = createTable(
-            [
+        tableIndex = [
                 "ID",
                 "NOME",
                 "IDADE",
@@ -108,9 +109,8 @@ class StudentLayout(QVBoxLayout):
                 "ENDEREÇO",
                 "TURNO",
                 "SÉRIE"
-            ],
-            STUDENTS_INFO
-        )
+        ]
+        self.studentTable = createTable(tableIndex, STUDENTS_INFO)
 
         self.addWidget(self.studentTable)
         self.addWidget(register)
@@ -129,17 +129,15 @@ class BookLayout(QVBoxLayout):
         self.registerWindow = BookRegisterWindow()
         self.changeRegisterWindow = BookRegisterWindow(changeRegister=True)
         self.deleteRegisterwindow = DeleteRegisterWindow("Livro")
-        self.bookTable = createTable(
-            [
-                "ID",
-                "TÍTULO",
-                "AUTOR",
-                "EDITORA",
-                "GÊNERO",
-                "QUANTIDADE"
-            ],
-            BOOKS_INFO
-        )
+        tableIndex = [
+            "ID",
+            "TÍTULO",
+            "AUTOR",
+            "EDITORA",
+            "GÊNERO",
+            "QUANTIDADE"
+        ]
+        self.bookTable = createTable(tableIndex, BOOKS_INFO)
 
         self.addWidget(self.bookTable)
         register = MyButtons("Cadastro")
@@ -159,16 +157,16 @@ class loanAndDevolutionLayout(QVBoxLayout):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        self.loanTable = createTable(
-            [
+        self.makeLoanWindow = LoanANdDevolutionWindow(True)
+        self.makeDevolution = LoanANdDevolutionWindow()
+        tableIndex = [
                 "ID EMPŔESTIMO",
                 "ID ALUNO",
                 "ID LIVRO",
                 "DATA EMPRÉSTIMO",
                 "DATA DEVOLUÇÃO"
-            ],
-            LOAN_INFO
-        )
+            ]
+        self.loanTable = createTable(tableIndex, LOAN_INFO)
 
         self.addWidget(self.loanTable)
         loan = MyButtons("Realizar Empréstimo")
@@ -176,6 +174,9 @@ class loanAndDevolutionLayout(QVBoxLayout):
 
         self.addWidget(loan)
         self.addWidget(devolution)
+
+        loan.clicked.connect(self.makeLoanWindow.show)
+        devolution.clicked.connect(self.makeDevolution.show)
 
 
 class InitialLayout(QGridLayout):
