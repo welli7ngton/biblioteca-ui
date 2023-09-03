@@ -11,7 +11,7 @@ BOOK = Book()
 DATABASE = DataBase()
 
 
-class BaseRegisterWindow(QDialog):
+class BaseWindow(QDialog):
     def __init__(self, windowName: str, fields: list[tuple]) -> None:
         super().__init__()
         self.setWindowTitle(windowName)
@@ -23,7 +23,7 @@ class BaseRegisterWindow(QDialog):
         for field_name, field_widget in fields:
             field_widget = field_widget()
             self.fields[field_name] = field_widget
-            if field_name == "ID" or field_name == "Quantidade":
+            if "ID" in field_name or "Quantidade" in field_name:
                 field_widget.setRange(0, 9999999)
             _layout.addRow(field_name + ":", field_widget)
 
@@ -33,21 +33,25 @@ class BaseRegisterWindow(QDialog):
         _layout.addWidget(self.buttonBox)
 
         if windowName == "Cadastro de Aluno":
-            self.buttonBox.accepted.connect(self.getNewStundetInfos)
+            self.buttonBox.accepted.connect(self._getNewStundetInfos)
         elif windowName == "Altera Cadastro - Aluno":
-            self.buttonBox.accepted.connect(self.getChangesStudent)
+            self.buttonBox.accepted.connect(self._getChangesStudent)
         elif windowName == "Cadastro de Livro":
-            self.buttonBox.accepted.connect(self.getNewBookInfos)
+            self.buttonBox.accepted.connect(self._getNewBookInfos)
         elif windowName == "Altera Cadastro - Livro":
-            self.buttonBox.accepted.connect(self.getChangesBook)
+            self.buttonBox.accepted.connect(self._getChangesBook)
         elif windowName == "Apagar Cadastro - Aluno":
-            self.buttonBox.accepted.connect(self.deleteStudentRegister)
+            self.buttonBox.accepted.connect(self._deleteStudentRegister)
         elif windowName == "Apagar Cadastro - Livro":
-            self.buttonBox.accepted.connect(self.deleteBookRegister)
+            self.buttonBox.accepted.connect(self._deleteBookRegister)
+        elif windowName == "Realizar Empréstimo":
+            self.buttonBox.accepted.connect(self._registerLoan)
+        elif windowName == "Realizar Devolução":
+            self.buttonBox.accepted.connect(self._deleteLoan)
 
         self.buttonBox.rejected.connect(self.reject)
 
-    def getNewStundetInfos(self):
+    def _getNewStundetInfos(self):
         attributes = []
         for field in self.fields.values():
             attributes.append(field.text())
@@ -62,7 +66,7 @@ class BaseRegisterWindow(QDialog):
         DATABASE.registerStudent(STUDENT)
         self._makeMessageBox("Cadastro Realizado!", attributes)
 
-    def getNewBookInfos(self):
+    def _getNewBookInfos(self):
         attributes = []
         for field in self.fields.values():
             attributes.append(field.text())
@@ -76,39 +80,39 @@ class BaseRegisterWindow(QDialog):
         DATABASE.registerBook(BOOK)
         self._makeMessageBox("Cadastro Realizado!", attributes)
 
-    def getChangesStudent(self):
+    def _getChangesStudent(self):
         attributes = []
-        _student = Student()
+        STUDENT = Student()
         for field in self.fields.values():
             attributes.append(field.text())
             field.clear()
         print(attributes)
         _id = int(attributes[0])
-        _student.setName = attributes[1]
-        _student.setAge = int(attributes[2])
-        _student.setAdress = attributes[3]
-        _student.setContactNumber = attributes[4]
-        _student.setShift = attributes[5]
-        _student.setGradeYear = attributes[6]
-        DATABASE.changeRegisterStudent(_id, _student)
+        STUDENT.setName = attributes[1]
+        STUDENT.setAge = int(attributes[2])
+        STUDENT.setAdress = attributes[3]
+        STUDENT.setContactNumber = attributes[4]
+        STUDENT.setShift = attributes[5]
+        STUDENT.setGradeYear = attributes[6]
+        DATABASE.changeRegisterStudent(_id, STUDENT)
         self._makeMessageBox("Cadastro Atualizado!", attributes[1:])
 
-    def getChangesBook(self):
+    def _getChangesBook(self):
         attributes = []
-        _book = Book()
+
         for field in self.fields.values():
             attributes.append(field.text())
             field.clear()
         _id = int(attributes[0])
-        _book.setTitle = attributes[1]
-        _book.setAuthor = attributes[2]
-        _book.setPublishingCompany = attributes[3]
-        _book.setGender = attributes[4]
-        _book.setAmount = int(attributes[5])
-        DATABASE.changeRegisterBook(_id, _book)
+        BOOK.setTitle = attributes[1]
+        BOOK.setAuthor = attributes[2]
+        BOOK.setPublishingCompany = attributes[3]
+        BOOK.setGender = attributes[4]
+        BOOK.setAmount = int(attributes[5])
+        DATABASE.changeRegisterBook(_id, BOOK)
         self._makeMessageBox("Cadastro Atualizado!", attributes[1:])
 
-    def deleteStudentRegister(self):
+    def _deleteStudentRegister(self):
         for field in self.fields.values():
             _id = field.text()
         try:
@@ -126,7 +130,7 @@ class BaseRegisterWindow(QDialog):
             "Registros do Aluno foram apagados do sistema."
         )
 
-    def deleteBookRegister(self):
+    def _deleteBookRegister(self):
         for field in self.fields.values():
             _id = field.text()
 
@@ -145,18 +149,49 @@ class BaseRegisterWindow(QDialog):
             "Registros do Livro foram apagados do sistema."
         )
 
+    def _registerLoan(self):
+        attributes = []
+
+        for field in self.fields.values():
+            attributes.append(field.text())
+            field.clear()
+        studentID = int(attributes[0])
+        bookID = int(attributes[0])
+        devolutionDate = int(attributes[0])
+        DATABASE.registerLoan(studentID, bookID, devolutionDate)
+        self._makeMessageBox("Cadastro Realizado!", attributes)
+
+    def _deleteLoan(self):
+        for field in self.fields.values():
+            _id = field.text()
+
+        try:
+            DATABASE.deleteRegister(int(_id), "loan", "loan_id")
+        except Exception as e:
+            if "ID NÃO EXISTE" in str(e):
+                self._makeMessageBox(
+                    "Cadastro Não Encontrado!",
+                    "O ID informado aparenta não existir, "
+                    "revise o ID e tente novamente."
+                )
+                return
+        self._makeMessageBox(
+            "Devolução Realizada!",
+            "Registros foram apagados do sistema."
+        )
+
     def _makeMessageBox(self, _title: str, _content: list):
         messageBox = QMessageBox()
         messageBox.setWindowTitle(_title)
         messageBox.setIcon(messageBox.Icon.Information)
         messageBox.setText(
-            "informações adicionadas:"
+            "Informações:"
             f"{_content}"
         )
         messageBox.exec()
 
 
-class StudentRegisterWindow(BaseRegisterWindow):
+class StudentRegisterWindow(BaseWindow):
     def __init__(self, changeRegister=False):
         if changeRegister:
             fields = [
@@ -180,7 +215,7 @@ class StudentRegisterWindow(BaseRegisterWindow):
         super().__init__("Cadastro de Aluno", fields)
 
 
-class BookRegisterWindow(BaseRegisterWindow):
+class BookRegisterWindow(BaseWindow):
     def __init__(self, changeRegister=False):
         if changeRegister:
             fields = [
@@ -202,6 +237,21 @@ class BookRegisterWindow(BaseRegisterWindow):
         super().__init__("Cadastro de Livro", fields)
 
 
-class DeleteRegisterWindow(BaseRegisterWindow):
+class DeleteRegisterWindow(BaseWindow):
     def __init__(self, _type: str) -> None:
         super().__init__("Apagar Cadastro" + " - " + _type, [("ID", QSpinBox)])
+
+
+class LoanANdDevolutionWindow(BaseWindow):
+    def __init__(self, makeLoan=False):
+        if not makeLoan:
+            fields = [
+                ("ID Empréstimo", QSpinBox),
+            ]
+            return super().__init__("Realizar Devolução", fields)
+        fields = [
+                ("ID Aluno", QSpinBox),
+                ("ID Livro", QSpinBox),
+                ("Periodo do empréstimo", QSpinBox),
+            ]
+        super().__init__("Realizar Empréstimo", fields)
