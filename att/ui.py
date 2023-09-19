@@ -1,13 +1,17 @@
 from PySide6.QtWidgets import (
-    QMainWindow, QWidget, QTabWidget, QGridLayout,
-    QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView
+    QMainWindow, QWidget, QTabWidget, QGridLayout, QCalendarWidget, QGroupBox,
+    QVBoxLayout, QTableWidget, QTableWidgetItem, QHeaderView, QLabel
 )
+
 from function_windows import (
     StudentRegisterWindow,
     BookRegisterWindow,
     DeleteRegisterWindow,
     LoanANdDevolutionWindow
 )
+
+from PySide6.QtCore import Qt
+
 from mybuttons import MyButtons
 from database import DataBase
 import qdarktheme
@@ -43,6 +47,7 @@ def createTable(headerLabels: list[str], infos: list[tuple]) -> QTableWidget:
     table.horizontalHeader().setStretchLastSection(True)
     table.setEditTriggers(QTableWidget.NoEditTriggers)
     table.setFixedHeight(500)
+    table.setFixedWidth(1300)
     table.horizontalHeader().setSectionResizeMode(
         QHeaderView.Stretch
     )
@@ -112,10 +117,12 @@ class StudentLayout(QVBoxLayout):
         ]
         self.studentTable = createTable(tableIndex, STUDENTS_INFO)
 
-        self.addWidget(self.studentTable)
-        self.addWidget(register)
-        self.addWidget(changeRegister)
-        self.addWidget(deleteRegister)
+        self.addWidget(
+            self.studentTable, alignment=Qt.AlignmentFlag.AlignHCenter
+        )
+        self.addWidget(register, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.addWidget(changeRegister, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.addWidget(deleteRegister, alignment=Qt.AlignmentFlag.AlignCenter)
 
         register.clicked.connect(self.registerWindow.show)
         changeRegister.clicked.connect(self.changeRegisterWindow.show)
@@ -139,14 +146,16 @@ class BookLayout(QVBoxLayout):
         ]
         self.bookTable = createTable(tableIndex, BOOKS_INFO)
 
-        self.addWidget(self.bookTable)
+        self.addWidget(
+            self.bookTable, alignment=Qt.AlignmentFlag.AlignHCenter
+        )
         register = MyButtons("Cadastro")
         changeRegister = MyButtons("Alterar Cadastro")
         deleteRegister = MyButtons("Apagar Cadastro")
 
-        self.addWidget(register)
-        self.addWidget(changeRegister)
-        self.addWidget(deleteRegister)
+        self.addWidget(register, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.addWidget(changeRegister, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.addWidget(deleteRegister, alignment=Qt.AlignmentFlag.AlignCenter)
 
         register.clicked.connect(self.registerWindow.show)
         changeRegister.clicked.connect(self.changeRegisterWindow.show)
@@ -168,27 +177,58 @@ class loanAndDevolutionLayout(QVBoxLayout):
             ]
         self.loanTable = createTable(tableIndex, LOAN_INFO)
 
-        self.addWidget(self.loanTable)
+        self.addWidget(
+            self.loanTable, alignment=Qt.AlignmentFlag.AlignHCenter
+        )
         loan = MyButtons("Realizar Empréstimo")
         devolution = MyButtons("Realizar Devolução")
 
-        self.addWidget(loan)
-        self.addWidget(devolution)
+        self.addWidget(loan, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.addWidget(devolution, alignment=Qt.AlignmentFlag.AlignCenter)
 
         loan.clicked.connect(self.makeLoanWindow.show)
         devolution.clicked.connect(self.makeDevolution.show)
 
 
-class InitialLayout(QGridLayout):
+class InitialLayout(QVBoxLayout):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-        b1 = MyButtons("Escuro")
-        b2 = MyButtons("Claro")
+        label = QLabel("Escolha o tema:")
 
-        self.addWidget(b1, 1, 1)
-        self.addWidget(b2, 1, 2)
+        font = label.font()
 
-        b1.clicked.connect(changeTheme(qdarktheme.setup_theme, "dark"))
-        b2.clicked.connect(changeTheme(qdarktheme.setup_theme, "light"))
+        font.setPixelSize(32)
+        label.setFont(font)
+        label.setFixedHeight(40)
+        self.addWidget(label, 2, Qt.AlignmentFlag.AlignHCenter)
+
+        theme_group = QGroupBox()
+        theme_layout = QGridLayout()
+        theme_group.setLayout(theme_layout)
+        theme_group.setFixedHeight(120)
+        theme_group.setFixedWidth(900)
+        dark_btn = MyButtons("Tema Escuro")
+        light_btn = MyButtons("Tema Claro")
+
+        dark_btn.setFixedWidth(400)
+        light_btn.setFixedWidth(400)
+
+        theme_layout.addWidget(dark_btn, 0, 0)
+        theme_layout.addWidget(light_btn, 0, 1)
+
+        dark_btn.clicked.connect(changeTheme(qdarktheme.setup_theme, "dark"))
+        light_btn.clicked.connect(changeTheme(qdarktheme.setup_theme, "light"))
+
+        self.addWidget(theme_group, alignment=Qt.AlignmentFlag.AlignHCenter)
+
+        self.addWidget(
+            self.myCalendar(), 1, Qt.AlignmentFlag.AlignHCenter
+        )
+
+    def myCalendar(self):
+        c = QCalendarWidget()
+        c.setFixedWidth(500)
+        c.setFixedHeight(500)
+        return c
